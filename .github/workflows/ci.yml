@@ -2,15 +2,18 @@ name: CI
 
 on:
   push:
-    branches: ['**']
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
   pull_request:
-    branches: ['**']
 
 jobs:
   validate:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,4 +37,11 @@ jobs:
 
       - name: Run unit tests
         run: node tests/unit.test.js
+
+      - name: Dependabot Auto Merge
+        if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GH_ACTION_MERGER_TOKEN }}
 
