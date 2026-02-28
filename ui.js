@@ -103,10 +103,6 @@ function renderTransactionBar(total, received, change, tip) {
   const tipEl = document.getElementById('tx-tip');
   if (tipEl) tipEl.textContent = formatCurrency(tip);
 
-  const receivedInput = document.getElementById('tx-received');
-  if (receivedInput && receivedInput.value !== received) {
-    // Don't overwrite user input
-  }
 }
 
 // ─── Settings Screen ──────────────────────────────────────────────────────────
