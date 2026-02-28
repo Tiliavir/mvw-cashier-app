@@ -81,6 +81,23 @@ var Store = (function () {
     return updateEvent(state, updatedEvent);
   }
 
+  function updateItemInEvent(state, eventId, updatedItem) {
+    const event = state.events.find(function (e) { return e.id === eventId; });
+    if (!event) return state;
+    const updatedEvent = Object.assign({}, event);
+    updatedEvent.items = event.items.map(function (i) {
+      return i.id === updatedItem.id ? updatedItem : i;
+    });
+    return updateEvent(state, updatedEvent);
+  }
+
+  function reorderItemsInEvent(state, eventId, reorderedItems) {
+    const event = state.events.find(function (e) { return e.id === eventId; });
+    if (!event) return state;
+    const updatedEvent = Object.assign({}, event, { items: reorderedItems });
+    return updateEvent(state, updatedEvent);
+  }
+
   // ─── Transaction operations ──────────────────────────────────────────────
   function addTransaction(state, eventId, transaction) {
     const event = state.events.find(function (e) { return e.id === eventId; });
@@ -122,6 +139,8 @@ var Store = (function () {
     updateEvent,
     addItemToEvent,
     removeItemFromEvent,
+    updateItemInEvent,
+    reorderItemsInEvent,
     addTransaction,
     closeEvent,
     resetState,
