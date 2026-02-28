@@ -285,6 +285,44 @@ test('resetState clears localStorage and returns default', function () {
   assertEqual(global.localStorage._store[Storage.STORAGE_KEY], undefined);
 });
 
+test('updateItemInEvent updates item fields', function () {
+  let state = Storage.defaultState();
+  const event = Models.createEvent('Test');
+  state = Storage.addEvent(state, event);
+  const item = Models.createItem('Alt', '1.00', '#aaaaaa');
+  state = Storage.addItemToEvent(state, event.id, item);
+  const updated = Object.assign({}, item, { name: 'Neu', price: 2.5, color: '#ff0000' });
+  state = Storage.updateItemInEvent(state, event.id, updated);
+  const active = Storage.getActiveEvent(state);
+  assertEqual(active.items[0].name, 'Neu');
+  assertClose(active.items[0].price, 2.5);
+  assertEqual(active.items[0].color, '#ff0000');
+  assertEqual(active.items[0].id, item.id, 'id must not change');
+});
+
+test('updateItemInEvent is a no-op for unknown event', function () {
+  let state = Storage.defaultState();
+  const item = Models.createItem('X', '1.00', '#000');
+  const stateBefore = state;
+  const stateAfter = Storage.updateItemInEvent(state, 'nonexistent', item);
+  assertEqual(stateAfter.events.length, stateBefore.events.length);
+});
+
+test('reorderItemsInEvent reorders items in event', function () {
+  let state = Storage.defaultState();
+  const event = Models.createEvent('Test');
+  state = Storage.addEvent(state, event);
+  const a = Models.createItem('A', '1.00', '#aaa');
+  const b = Models.createItem('B', '2.00', '#bbb');
+  state = Storage.addItemToEvent(state, event.id, a);
+  state = Storage.addItemToEvent(state, event.id, b);
+  const reordered = [b, a];
+  state = Storage.reorderItemsInEvent(state, event.id, reordered);
+  const active = Storage.getActiveEvent(state);
+  assertEqual(active.items[0].name, 'B');
+  assertEqual(active.items[1].name, 'A');
+});
+
 // ─── Drag-and-drop reorder helper (mirrors app.js logic) ─────────────────────
 console.log('\nReorder logic (drag-and-drop):');
 

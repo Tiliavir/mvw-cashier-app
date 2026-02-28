@@ -32,9 +32,9 @@ var UI = (function () {
     showScreen('screen-setup');
   }
 
-  // ─── Item list rendering (setup) ─────────────────────────────────────────
-  function renderSetupItems(items, editingItemId) {
-    const container = document.getElementById('setup-items-list');
+  // ─── Item list rendering (setup and settings) ────────────────────────────
+  function renderSetupItems(items, editingItemId, containerId) {
+    const container = document.getElementById(containerId || 'setup-items-list');
     if (!container) return;
     container.innerHTML = '';
     if (items.length === 0) {
@@ -108,6 +108,7 @@ var UI = (function () {
         const qtyEl = document.createElement('span');
         qtyEl.className = 'tile-qty';
         qtyEl.textContent = qty;
+        qtyEl.title = 'Anzahl verringern';
         tile.appendChild(qtyEl);
       }
 
