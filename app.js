@@ -124,6 +124,24 @@ const App = (function () {
       updateTransactionBar();
     });
 
+    // Tip input – user may override the auto-calculated tip;
+    // recalculate change to keep: received = total + change + tip
+    on('tx-tip', 'input', function () {
+      const active = Store.getActiveEvent(state);
+      if (!active) return;
+      const itemsMap = Models.buildItemsMap(active.items);
+      const total = Models.calculateTotal(cart, itemsMap);
+      const receivedInput = document.getElementById('tx-received');
+      const tipInput = document.getElementById('tx-tip');
+      const received = receivedInput ? Models.safeParseFloat(receivedInput.value) : 0;
+      const safeReceived = received < 0 ? 0 : received;
+      const manualTip = tipInput ? Models.safeParseFloat(tipInput.value) : 0;
+      const safeTip = manualTip < 0 ? 0 : manualTip;
+      const change = Math.max(0, Math.round((safeReceived - total - safeTip) * 100) / 100);
+      const changeEl = document.getElementById('tx-change');
+      if (changeEl) changeEl.textContent = UI.formatCurrency(change);
+    });
+
     // Next transaction
     on('btn-next-tx', 'click', function () {
       const active = Store.getActiveEvent(state);
@@ -136,10 +154,20 @@ const App = (function () {
       const total = Models.calculateTotal(cart, itemsMap);
 
       const receivedInput = document.getElementById('tx-received');
+      const tipInput = document.getElementById('tx-tip');
       const received = receivedInput ? Models.safeParseFloat(receivedInput.value) : 0;
       const safeReceived = received < 0 ? 0 : received;
-      const change = Models.calculateChange(total, safeReceived);
-      const tip = Models.calculateTip(total, safeReceived, change);
+
+      // Prefer manually entered tip; fall back to auto-calculated value
+      const tipRaw = tipInput ? tipInput.value : '';
+      let tip, change;
+      if (tipRaw !== '') {
+        tip = Math.max(0, Models.safeParseFloat(tipRaw));
+        change = Math.max(0, Math.round((safeReceived - total - tip) * 100) / 100);
+      } else {
+        change = Models.calculateChange(total, safeReceived);
+        tip = Models.calculateTip(total, safeReceived, change);
+      }
 
       // Build transaction items array
       const txItems = [];
@@ -155,6 +183,7 @@ const App = (function () {
       // Reset
       cart = {};
       if (receivedInput) receivedInput.value = '';
+      if (tipInput) tipInput.value = '';
       const updatedActive = Store.getActiveEvent(state);
       if (updatedActive) UI.renderItemGrid(updatedActive.items, cart);
       updateTransactionBar();

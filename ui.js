@@ -104,7 +104,7 @@ var UI = (function () {
     if (changeEl) changeEl.textContent = formatCurrency(change);
 
     const tipEl = document.getElementById('tx-tip');
-    if (tipEl) tipEl.textContent = formatCurrency(tip);
+    if (tipEl) tipEl.value = tip > 0 ? tip.toFixed(2) : '';
   }
 
   // ─── Settings Screen ─────────────────────────────────────────────────────
