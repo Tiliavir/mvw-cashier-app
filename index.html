@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Vereins-Kassierer App – Browser-basierte Kasse für Vereinsfeste" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Vereins-Kassierer App – Browser-basierte Kasse für Vereinsfeste">
   <title>MVW Kassierer App</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -15,8 +15,9 @@
       <h1>Neue Veranstaltung</h1>
     </header>
 
-    <main class="setup-main">
+    <div class="setup-main">
       <section class="setup-section">
+        <h2 class="section-title">Veranstaltung</h2>
         <label for="event-name" class="field-label">Veranstaltungsname</label>
         <input
           id="event-name"
@@ -24,7 +25,7 @@
           class="text-input"
           placeholder="z.B. Fastnachtsfeuer 2026"
           autocomplete="off"
-        />
+        >
       </section>
 
       <section class="setup-section">
@@ -37,17 +38,17 @@
             class="text-input"
             placeholder="Artikelname"
             autocomplete="off"
-          />
+          >
           <input
             id="item-price"
             type="number"
             class="text-input"
             placeholder="Preis (€)"
             step="0.01"
-          />
+          >
           <div class="color-row">
             <label for="item-color" class="field-label">Farbe</label>
-            <input id="item-color" type="color" value="#cccccc" class="color-input" />
+            <input id="item-color" type="color" value="#cccccc" class="color-input">
           </div>
           <button id="btn-add-item" class="btn btn-secondary">+ Artikel</button>
         </div>
@@ -58,7 +59,7 @@
       <button id="btn-start-event" class="btn btn-primary btn-full">
         Veranstaltung starten ▶
       </button>
-    </main>
+    </div>
   </div>
 
   <!-- ── Cashier Screen ───────────────────────────────────── -->
@@ -68,9 +69,9 @@
       <button id="btn-settings" class="btn btn-icon-only" aria-label="Einstellungen">⚙</button>
     </header>
 
-    <main class="cashier-main">
+    <div class="cashier-main">
       <div id="item-grid" class="item-grid"></div>
-    </main>
+    </div>
 
     <!-- Transaction bar -->
     <footer class="tx-bar">
@@ -87,7 +88,7 @@
           placeholder="0,00"
           min="0"
           step="0.01"
-        />
+        >
       </div>
       <div class="tx-row">
         <span class="tx-label">Rückgeld</span>
@@ -110,7 +111,7 @@
       <h1>Einstellungen</h1>
     </header>
 
-    <main class="settings-main">
+    <div class="settings-main">
       <section class="settings-section">
         <h2 class="section-title">Aktuelle Veranstaltung</h2>
         <div class="info-grid">
@@ -125,20 +126,20 @@
         </div>
       </section>
 
-      <section class="settings-section settings-actions">
+      <div class="settings-section settings-actions">
         <button id="btn-close-event" class="btn btn-danger btn-full">
           Veranstaltung beenden
         </button>
         <button id="btn-new-event" class="btn btn-secondary btn-full">
           Neue Veranstaltung anlegen
         </button>
-      </section>
+      </div>
 
       <section class="settings-section">
         <h2 class="section-title">Vergangene Veranstaltungen</h2>
         <div id="past-events-list" class="past-events-list"></div>
       </section>
-    </main>
+    </div>
   </div>
 
   <script src="models.js"></script>
@@ -147,3 +148,4 @@
   <script src="app.js"></script>
 </body>
 </html>
+

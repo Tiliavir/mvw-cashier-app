@@ -10,9 +10,9 @@ const App = (function () {
 
   // ─── Init ───────────────────────────────────────────────────────────────────
   function init() {
-    state = Storage.loadState();
+    state = Store.loadState();
 
-    const active = Storage.getActiveEvent(state);
+    const active = Store.getActiveEvent(state);
     if (!active) {
       showSetup();
     } else {
@@ -30,7 +30,7 @@ const App = (function () {
   }
 
   function showCashier() {
-    const active = Storage.getActiveEvent(state);
+    const active = Store.getActiveEvent(state);
     if (!active) {
       showSetup();
       return;
@@ -46,7 +46,7 @@ const App = (function () {
 
   // ─── Transaction bar update ──────────────────────────────────────────────────
   function updateTransactionBar() {
-    const active = Storage.getActiveEvent(state);
+    const active = Store.getActiveEvent(state);
     if (!active) return;
 
     const itemsMap = Models.buildItemsMap(active.items);
@@ -103,7 +103,7 @@ const App = (function () {
 
       const event = Models.createEvent(name);
       event.items = pendingItems.slice();
-      state = Storage.addEvent(state, event);
+      state = Store.addEvent(state, event);
       showCashier();
     });
 
@@ -114,7 +114,7 @@ const App = (function () {
       if (!tile) return;
       const id = tile.dataset.id;
       cart[id] = (cart[id] || 0) + 1;
-      const active = Storage.getActiveEvent(state);
+      const active = Store.getActiveEvent(state);
       if (active) UI.renderItemGrid(active.items, cart);
       updateTransactionBar();
     });
@@ -126,7 +126,7 @@ const App = (function () {
 
     // Next transaction
     on('btn-next-tx', 'click', function () {
-      const active = Storage.getActiveEvent(state);
+      const active = Store.getActiveEvent(state);
       if (!active) return;
 
       const hasItems = Object.values(cart).some(function (q) { return q > 0; });
@@ -150,12 +150,12 @@ const App = (function () {
       }
 
       const tx = Models.createTransaction(txItems, total, safeReceived, change, tip);
-      state = Storage.addTransaction(state, active.id, tx);
+      state = Store.addTransaction(state, active.id, tx);
 
       // Reset
       cart = {};
       if (receivedInput) receivedInput.value = '';
-      const updatedActive = Storage.getActiveEvent(state);
+      const updatedActive = Store.getActiveEvent(state);
       if (updatedActive) UI.renderItemGrid(updatedActive.items, cart);
       updateTransactionBar();
     });
@@ -173,10 +173,10 @@ const App = (function () {
 
     // Close event
     on('btn-close-event', 'click', function () {
-      const active = Storage.getActiveEvent(state);
+      const active = Store.getActiveEvent(state);
       if (!active) return;
       if (!confirm('Veranstaltung "' + active.name + '" wirklich beenden?')) return;
-      state = Storage.closeEvent(state, active.id);
+      state = Store.closeEvent(state, active.id);
       showSettings();
     });
 

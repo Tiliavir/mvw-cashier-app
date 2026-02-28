@@ -1,0 +1,24 @@
+{
+  "name": "mvw-cashier-app",
+  "version": "1.0.0",
+  "description": "Browser-based cashier app for club events",
+  "license": "MIT",
+  "author": "Tiliavir",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tiliavir/mvw-cashier-app.git"
+  },
+  "scripts": {
+    "lint": "stylelint style.css && eslint .",
+    "validate": "npx vnu --skip-non-html index.html",
+    "test": "node tests/unit.test.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.0.2",
+    "globals": "17.3.0",
+    "stylelint": "17.4.0",
+    "stylelint-config-standard": "40.0.0",
+    "vnu-jar": "26.2.26"
+  }
+}

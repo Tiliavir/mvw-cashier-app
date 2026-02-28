@@ -42,21 +42,46 @@ Alternatively, push a tag (`v*`) to trigger the release workflow, which automati
 ├── storage.js          # LocalStorage read/write operations
 ├── ui.js               # DOM rendering helpers
 ├── app.js              # Application logic and event handling
+├── package.json        # Dev dependencies (linting + HTML validation only)
+├── eslint.config.mjs   # ESLint flat config for Vanilla JS
+├── .stylelintrc        # Stylelint config (stylelint-config-standard)
 ├── tests/
 │   └── unit.test.js    # Node.js unit tests (no framework needed)
 └── .github/
     ├── dependabot.yml
     └── workflows/
-        ├── ci.yml          # CI: HTML validation + JS syntax + unit tests
+        ├── ci.yml          # CI: vnu-jar HTML + stylelint CSS + eslint JS + unit tests
         ├── release.yml     # Release: GitHub Release + GitHub Pages deploy
         └── automerge.yml   # Auto-merge PRs labeled 'automerge'
 ```
 
 ---
 
+## Development Setup
+
+Install dev dependencies (linting and validation only — not needed to run the app):
+
+```bash
+npm install
+```
+
+Lint CSS and JavaScript:
+
+```bash
+npm run lint
+```
+
+Validate HTML with vnu-jar:
+
+```bash
+npm run validate
+```
+
+---
+
 ## Running Tests
 
-Tests require only Node.js (no npm install needed):
+Tests require only Node.js:
 
 ```bash
 node tests/unit.test.js
