@@ -7,6 +7,10 @@ const App = (function () {
   let cart = {};
   // Pending setup items (before event is saved)
   let pendingItems = [];
+  // Drag-and-drop: ID of item being dragged
+  let dragSrcId = null;
+  // Inline edit: ID of item currently being edited in setup list
+  let editingItemId = null;
 
   // ─── Init ───────────────────────────────────────────────────────────────────
   function init() {
@@ -25,8 +29,9 @@ const App = (function () {
   // ─── Navigation ─────────────────────────────────────────────────────────────
   function showSetup() {
     pendingItems = [];
+    editingItemId = null;
     UI.renderSetupScreen();
-    UI.renderSetupItems(pendingItems);
+    UI.renderSetupItems(pendingItems, editingItemId);
   }
 
   function showCashier() {
@@ -77,7 +82,8 @@ const App = (function () {
 
       const item = Models.createItem(name, price, color);
       pendingItems.push(item);
-      UI.renderSetupItems(pendingItems);
+      editingItemId = null;
+      UI.renderSetupItems(pendingItems, editingItemId);
 
       // Reset input fields
       if (nameInput) nameInput.value = '';
@@ -92,7 +98,102 @@ const App = (function () {
       if (!btn) return;
       const id = btn.dataset.id;
       pendingItems = pendingItems.filter(function (i) { return i.id !== id; });
-      UI.renderSetupItems(pendingItems);
+      editingItemId = null;
+      UI.renderSetupItems(pendingItems, editingItemId);
+    });
+
+    // Inline edit: click row to enter edit mode; save / cancel
+    on('setup-items-list', 'click', function (e) {
+      // Save button
+      if (e.target.closest('.btn-save-item')) {
+        const btn = e.target.closest('.btn-save-item');
+        const id = btn.dataset.id;
+        const container = document.getElementById('setup-items-list');
+        const row = container ? container.querySelector('[data-id="' + id + '"]') : null;
+        if (!row) return;
+        const nameInput = row.querySelector('.edit-name');
+        const priceInput = row.querySelector('.edit-price');
+        const colorInput = row.querySelector('.edit-color');
+        const name = nameInput ? nameInput.value.trim() : '';
+        const price = priceInput ? priceInput.value : '';
+        const color = colorInput ? colorInput.value : '#cccccc';
+        if (!name) { alert('Bitte Artikelname eingeben.'); return; }
+        const idx = pendingItems.findIndex(function (i) { return i.id === id; });
+        if (idx >= 0) {
+          pendingItems[idx] = Object.assign({}, pendingItems[idx], {
+            name: name,
+            price: Models.safeParseFloat(price),
+            color: color,
+          });
+        }
+        editingItemId = null;
+        UI.renderSetupItems(pendingItems, editingItemId);
+        return;
+      }
+
+      // Cancel button
+      if (e.target.closest('.btn-cancel-edit')) {
+        editingItemId = null;
+        UI.renderSetupItems(pendingItems, editingItemId);
+        return;
+      }
+
+      // Click on a non-edit row: enter edit mode (ignore remove button)
+      if (e.target.closest('.btn-remove-item')) return;
+      const row = e.target.closest('.setup-item-row');
+      if (!row || row.classList.contains('setup-item-edit')) return;
+      editingItemId = row.dataset.id;
+      UI.renderSetupItems(pendingItems, editingItemId);
+    });
+
+    // Drag-and-drop reordering of setup items
+    on('setup-items-list', 'dragstart', function (e) {
+      const row = e.target.closest('.setup-item-row');
+      if (!row) return;
+      dragSrcId = row.dataset.id;
+      e.dataTransfer.effectAllowed = 'move';
+      row.classList.add('dragging');
+    });
+
+    on('setup-items-list', 'dragend', function (e) {
+      const row = e.target.closest('.setup-item-row');
+      if (row) row.classList.remove('dragging');
+      document.querySelectorAll('.setup-item-row.drag-over').forEach(function (el) {
+        el.classList.remove('drag-over');
+      });
+      dragSrcId = null;
+    });
+
+    on('setup-items-list', 'dragover', function (e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const row = e.target.closest('.setup-item-row');
+      if (!row || row.dataset.id === dragSrcId) return;
+      document.querySelectorAll('.setup-item-row.drag-over').forEach(function (el) {
+        el.classList.remove('drag-over');
+      });
+      row.classList.add('drag-over');
+    });
+
+    on('setup-items-list', 'dragleave', function (e) {
+      const row = e.target.closest('.setup-item-row');
+      if (row) row.classList.remove('drag-over');
+    });
+
+    on('setup-items-list', 'drop', function (e) {
+      e.preventDefault();
+      const row = e.target.closest('.setup-item-row');
+      if (!row) return;
+      row.classList.remove('drag-over');
+      const dropId = row.dataset.id;
+      if (!dragSrcId || dragSrcId === dropId) return;
+      const srcIdx = pendingItems.findIndex(function (i) { return i.id === dragSrcId; });
+      const dstIdx = pendingItems.findIndex(function (i) { return i.id === dropId; });
+      if (srcIdx < 0 || dstIdx < 0) return;
+      const moved = pendingItems.splice(srcIdx, 1)[0];
+      pendingItems.splice(dstIdx, 0, moved);
+      UI.renderSetupItems(pendingItems, editingItemId);
+      dragSrcId = null;
     });
 
     // Start event button
@@ -124,6 +225,24 @@ const App = (function () {
       updateTransactionBar();
     });
 
+    // Tip input – user may override the auto-calculated tip;
+    // recalculate change to keep: received = total + change + tip
+    on('tx-tip', 'input', function () {
+      const active = Store.getActiveEvent(state);
+      if (!active) return;
+      const itemsMap = Models.buildItemsMap(active.items);
+      const total = Models.calculateTotal(cart, itemsMap);
+      const receivedInput = document.getElementById('tx-received');
+      const tipInput = document.getElementById('tx-tip');
+      const received = receivedInput ? Models.safeParseFloat(receivedInput.value) : 0;
+      const safeReceived = received < 0 ? 0 : received;
+      const manualTip = tipInput ? Models.safeParseFloat(tipInput.value) : 0;
+      const safeTip = manualTip < 0 ? 0 : manualTip;
+      const change = Math.max(0, Math.round((safeReceived - total - safeTip) * 100) / 100);
+      const changeEl = document.getElementById('tx-change');
+      if (changeEl) changeEl.textContent = UI.formatCurrency(change);
+    });
+
     // Next transaction
     on('btn-next-tx', 'click', function () {
       const active = Store.getActiveEvent(state);
@@ -136,10 +255,20 @@ const App = (function () {
       const total = Models.calculateTotal(cart, itemsMap);
 
       const receivedInput = document.getElementById('tx-received');
+      const tipInput = document.getElementById('tx-tip');
       const received = receivedInput ? Models.safeParseFloat(receivedInput.value) : 0;
       const safeReceived = received < 0 ? 0 : received;
-      const change = Models.calculateChange(total, safeReceived);
-      const tip = Models.calculateTip(total, safeReceived, change);
+
+      // Prefer manually entered tip; fall back to auto-calculated value
+      const tipRaw = tipInput ? tipInput.value : '';
+      let tip, change;
+      if (tipRaw !== '') {
+        tip = Math.max(0, Models.safeParseFloat(tipRaw));
+        change = Math.max(0, Math.round((safeReceived - total - tip) * 100) / 100);
+      } else {
+        change = Models.calculateChange(total, safeReceived);
+        tip = Models.calculateTip(total, safeReceived, change);
+      }
 
       // Build transaction items array
       const txItems = [];
@@ -155,6 +284,7 @@ const App = (function () {
       // Reset
       cart = {};
       if (receivedInput) receivedInput.value = '';
+      if (tipInput) tipInput.value = '';
       const updatedActive = Store.getActiveEvent(state);
       if (updatedActive) UI.renderItemGrid(updatedActive.items, cart);
       updateTransactionBar();

@@ -285,6 +285,102 @@ test('resetState clears localStorage and returns default', function () {
   assertEqual(global.localStorage._store[Storage.STORAGE_KEY], undefined);
 });
 
+// ─── Drag-and-drop reorder helper (mirrors app.js logic) ─────────────────────
+console.log('\nReorder logic (drag-and-drop):');
+
+function reorderItems(items, srcId, dstId) {
+  const arr = items.slice();
+  const srcIdx = arr.findIndex(function (i) { return i.id === srcId; });
+  const dstIdx = arr.findIndex(function (i) { return i.id === dstId; });
+  if (srcIdx < 0 || dstIdx < 0 || srcIdx === dstIdx) return arr;
+  const moved = arr.splice(srcIdx, 1)[0];
+  arr.splice(dstIdx, 0, moved);
+  return arr;
+}
+
+test('reorder moves item from index 0 to index 2', function () {
+  const items = [
+    { id: 'a', name: 'A' },
+    { id: 'b', name: 'B' },
+    { id: 'c', name: 'C' },
+  ];
+  const result = reorderItems(items, 'a', 'c');
+  assertEqual(result[0].id, 'b');
+  assertEqual(result[1].id, 'c');
+  assertEqual(result[2].id, 'a');
+});
+
+test('reorder moves item from last to first', function () {
+  const items = [
+    { id: 'a', name: 'A' },
+    { id: 'b', name: 'B' },
+    { id: 'c', name: 'C' },
+  ];
+  const result = reorderItems(items, 'c', 'a');
+  assertEqual(result[0].id, 'c');
+  assertEqual(result[1].id, 'a');
+  assertEqual(result[2].id, 'b');
+});
+
+test('reorder is a no-op when src equals dst', function () {
+  const items = [
+    { id: 'a', name: 'A' },
+    { id: 'b', name: 'B' },
+  ];
+  const result = reorderItems(items, 'a', 'a');
+  assertEqual(result[0].id, 'a');
+  assertEqual(result[1].id, 'b');
+});
+
+test('reorder does not mutate original array', function () {
+  const items = [
+    { id: 'a', name: 'A' },
+    { id: 'b', name: 'B' },
+  ];
+  reorderItems(items, 'a', 'b');
+  assertEqual(items[0].id, 'a', 'original should be unchanged');
+});
+
+// ─── Inline-edit item update (mirrors app.js logic) ──────────────────────────
+console.log('\nInline-edit item update:');
+
+test('updateItem in pendingItems updates name, price and color', function () {
+  let pendingItems = [
+    Models.createItem('Alt', '1.00', '#aaaaaa'),
+  ];
+  const id = pendingItems[0].id;
+  const idx = pendingItems.findIndex(function (i) { return i.id === id; });
+  pendingItems[idx] = Object.assign({}, pendingItems[idx], {
+    name: 'Neu',
+    price: Models.safeParseFloat('2.50'),
+    color: '#ff0000',
+  });
+  assertEqual(pendingItems[0].name, 'Neu');
+  assertClose(pendingItems[0].price, 2.5);
+  assertEqual(pendingItems[0].color, '#ff0000');
+  assertEqual(pendingItems[0].id, id, 'id must not change');
+});
+
+// ─── Manual tip override logic (mirrors app.js next-tx handler) ───────────────
+console.log('\nManual tip override:');
+
+test('manual tip calculates change as received - total - tip', function () {
+  const total = 7.5;
+  const received = 10.0;
+  const manualTip = 0.5;
+  const change = Math.max(0, Math.round((received - total - manualTip) * 100) / 100);
+  assertClose(change, 2.0);
+});
+
+test('manual tip clamps change to 0 if tip exceeds available amount', function () {
+  const total = 7.5;
+  const received = 8.0;
+  const manualTip = 5.0; // more than the 0.5 surplus
+  const change = Math.max(0, Math.round((received - total - manualTip) * 100) / 100);
+  assertEqual(change, 0);
+});
+
+
 // ─── Summary ─────────────────────────────────────────────────────────────────
 console.log('\n─────────────────────────────');
 console.log('Tests passed: ' + passed);
