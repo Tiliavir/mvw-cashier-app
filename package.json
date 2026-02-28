@@ -11,7 +11,8 @@
   "scripts": {
     "lint": "stylelint style.css && eslint .",
     "validate": "npx vnu --skip-non-html index.html",
-    "test": "node tests/unit.test.js"
+    "test": "node tests/unit.test.js",
+    "build": "npm run lint && npm run validate && npm run test"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
