@@ -7,6 +7,8 @@ const App = (function () {
   let cart = {};
   // Pending setup items (before event is saved)
   let pendingItems = [];
+  // Drag-and-drop: ID of item being dragged
+  let dragSrcId = null;
 
   // ─── Init ───────────────────────────────────────────────────────────────────
   function init() {
@@ -93,6 +95,56 @@ const App = (function () {
       const id = btn.dataset.id;
       pendingItems = pendingItems.filter(function (i) { return i.id !== id; });
       UI.renderSetupItems(pendingItems);
+    });
+
+    // Drag-and-drop reordering of setup items
+    on('setup-items-list', 'dragstart', function (e) {
+      const row = e.target.closest('.setup-item-row');
+      if (!row) return;
+      dragSrcId = row.dataset.id;
+      e.dataTransfer.effectAllowed = 'move';
+      row.classList.add('dragging');
+    });
+
+    on('setup-items-list', 'dragend', function (e) {
+      const row = e.target.closest('.setup-item-row');
+      if (row) row.classList.remove('dragging');
+      document.querySelectorAll('.setup-item-row.drag-over').forEach(function (el) {
+        el.classList.remove('drag-over');
+      });
+      dragSrcId = null;
+    });
+
+    on('setup-items-list', 'dragover', function (e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const row = e.target.closest('.setup-item-row');
+      if (!row || row.dataset.id === dragSrcId) return;
+      document.querySelectorAll('.setup-item-row.drag-over').forEach(function (el) {
+        el.classList.remove('drag-over');
+      });
+      row.classList.add('drag-over');
+    });
+
+    on('setup-items-list', 'dragleave', function (e) {
+      const row = e.target.closest('.setup-item-row');
+      if (row) row.classList.remove('drag-over');
+    });
+
+    on('setup-items-list', 'drop', function (e) {
+      e.preventDefault();
+      const row = e.target.closest('.setup-item-row');
+      if (!row) return;
+      row.classList.remove('drag-over');
+      const dropId = row.dataset.id;
+      if (!dragSrcId || dragSrcId === dropId) return;
+      const srcIdx = pendingItems.findIndex(function (i) { return i.id === dragSrcId; });
+      const dstIdx = pendingItems.findIndex(function (i) { return i.id === dropId; });
+      if (srcIdx < 0 || dstIdx < 0) return;
+      const moved = pendingItems.splice(srcIdx, 1)[0];
+      pendingItems.splice(dstIdx, 0, moved);
+      UI.renderSetupItems(pendingItems);
+      dragSrcId = null;
     });
 
     // Start event button

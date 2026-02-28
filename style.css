@@ -203,6 +203,25 @@ html, body {
   background: #f9f9f9;
   border-radius: 6px;
   padding: 0.5rem 0.75rem;
+  border: 2px solid transparent;
+}
+
+.setup-item-row.dragging {
+  opacity: 0.4;
+}
+
+.setup-item-row.drag-over {
+  border-color: #3498db;
+  background: #ebf5fb;
+}
+
+.drag-handle {
+  cursor: grab;
+  color: #bbb;
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  user-select: none;
+  touch-action: none;
 }
 
 .setup-item-color {

@@ -44,7 +44,10 @@ var UI = (function () {
     items.forEach(function (item) {
       const div = document.createElement('div');
       div.className = 'setup-item-row';
+      div.draggable = true;
+      div.dataset.id = item.id;
       div.innerHTML =
+        '<span class="drag-handle" aria-hidden="true">⠿</span>' +
         '<span class="setup-item-color" style="background:' + escapeAttr(item.color) + '"></span>' +
         '<span class="setup-item-name">' + escapeHtml(item.name) + '</span>' +
         '<span class="setup-item-price">' + formatCurrency(item.price) + '</span>' +
