@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Vereins-Kassierer App – Browser-basierte Kasse für Vereinsfeste">
+  <title>MVW Kassierer App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── Setup Screen ─────────────────────────────────────── -->
+  <div id="screen-setup" class="screen active">
+    <header class="app-header">
+      <h1>Neue Veranstaltung</h1>
+    </header>
+
+    <div class="setup-main">
+      <section class="setup-section">
+        <h2 class="section-title">Veranstaltung</h2>
+        <label for="event-name" class="field-label">Veranstaltungsname</label>
+        <input
+          id="event-name"
+          type="text"
+          class="text-input"
+          placeholder="z.B. Fastnachtsfeuer 2026"
+          autocomplete="off"
+        >
+      </section>
+
+      <section class="setup-section">
+        <h2 class="section-title">Artikel hinzufügen</h2>
+
+        <div class="item-form">
+          <input
+            id="item-name"
+            type="text"
+            class="text-input"
+            placeholder="Artikelname"
+            autocomplete="off"
+          >
+          <input
+            id="item-price"
+            type="number"
+            class="text-input"
+            placeholder="Preis (€)"
+            step="0.01"
+          >
+          <div class="color-row">
+            <label for="item-color" class="field-label">Farbe</label>
+            <input id="item-color" type="color" value="#cccccc" class="color-input">
+          </div>
+          <button id="btn-add-item" class="btn btn-secondary">+ Artikel</button>
+        </div>
+
+        <div id="setup-items-list" class="setup-items-list"></div>
+      </section>
+
+      <button id="btn-start-event" class="btn btn-primary btn-full">
+        Veranstaltung starten ▶
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Cashier Screen ───────────────────────────────────── -->
+  <div id="screen-cashier" class="screen">
+    <header class="app-header cashier-header">
+      <h1 id="cashier-event-name" class="event-title">Kasse</h1>
+      <button id="btn-settings" class="btn btn-icon-only" aria-label="Einstellungen">⚙</button>
+    </header>
+
+    <div class="cashier-main">
+      <div id="item-grid" class="item-grid"></div>
+    </div>
+
+    <!-- Transaction bar -->
+    <footer class="tx-bar">
+      <div class="tx-row">
+        <span class="tx-label">Summe</span>
+        <span id="tx-total" class="tx-value tx-total">0,00 €</span>
+      </div>
+      <div class="tx-row">
+        <label for="tx-received" class="tx-label">Erhalten</label>
+        <input
+          id="tx-received"
+          type="number"
+          class="tx-input"
+          placeholder="0,00"
+          min="0"
+          step="0.01"
+        >
+      </div>
+      <div class="tx-row">
+        <span class="tx-label">Rückgeld</span>
+        <span id="tx-change" class="tx-value">0,00 €</span>
+      </div>
+      <div class="tx-row">
+        <span class="tx-label">Trinkgeld</span>
+        <span id="tx-tip" class="tx-value tx-tip">0,00 €</span>
+      </div>
+      <button id="btn-next-tx" class="btn btn-primary btn-full">
+        Nächste Transaktion ✓
+      </button>
+    </footer>
+  </div>
+
+  <!-- ── Settings Screen ──────────────────────────────────── -->
+  <div id="screen-settings" class="screen">
+    <header class="app-header">
+      <button id="btn-back-cashier" class="btn btn-back" aria-label="Zurück">← Zurück</button>
+      <h1>Einstellungen</h1>
+    </header>
+
+    <div class="settings-main">
+      <section class="settings-section">
+        <h2 class="section-title">Aktuelle Veranstaltung</h2>
+        <div class="info-grid">
+          <span class="info-label">Name</span>
+          <span id="settings-event-name" class="info-value">—</span>
+          <span class="info-label">Umsatz</span>
+          <span id="settings-revenue" class="info-value">0,00 €</span>
+          <span class="info-label">Trinkgeld</span>
+          <span id="settings-tip" class="info-value">0,00 €</span>
+          <span class="info-label">Transaktionen</span>
+          <span id="settings-tx-count" class="info-value">0</span>
+        </div>
+      </section>
+
+      <div class="settings-section settings-actions">
+        <button id="btn-close-event" class="btn btn-danger btn-full">
+          Veranstaltung beenden
+        </button>
+        <button id="btn-new-event" class="btn btn-secondary btn-full">
+          Neue Veranstaltung anlegen
+        </button>
+      </div>
+
+      <section class="settings-section">
+        <h2 class="section-title">Vergangene Veranstaltungen</h2>
+        <div id="past-events-list" class="past-events-list"></div>
+      </section>
+    </div>
+  </div>
+
+  <script src="models.js"></script>
+  <script src="storage.js"></script>
+  <script src="ui.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
