@@ -33,7 +33,7 @@ var UI = (function () {
   }
 
   // ─── Item list rendering (setup) ─────────────────────────────────────────
-  function renderSetupItems(items) {
+  function renderSetupItems(items, editingItemId) {
     const container = document.getElementById('setup-items-list');
     if (!container) return;
     container.innerHTML = '';
@@ -43,17 +43,34 @@ var UI = (function () {
     }
     items.forEach(function (item) {
       const div = document.createElement('div');
-      div.className = 'setup-item-row';
-      div.draggable = true;
       div.dataset.id = item.id;
-      div.innerHTML =
-        '<span class="drag-handle" aria-hidden="true">⠿</span>' +
-        '<span class="setup-item-color" style="background:' + escapeAttr(item.color) + '"></span>' +
-        '<span class="setup-item-name">' + escapeHtml(item.name) + '</span>' +
-        '<span class="setup-item-price">' + formatCurrency(item.price) + '</span>' +
-        '<button class="btn-icon btn-remove-item" data-id="' + escapeAttr(item.id) + '" aria-label="Artikel entfernen">✕</button>';
+
+      if (item.id === editingItemId) {
+        div.className = 'setup-item-row setup-item-edit';
+        div.innerHTML =
+          '<input type="text" class="text-input edit-name" value="' + escapeAttr(item.name) + '" aria-label="Artikelname" autocomplete="off">' +
+          '<input type="number" class="text-input edit-price" value="' + escapeAttr(String(item.price)) + '" step="0.01" aria-label="Preis">' +
+          '<input type="color" class="color-input edit-color" value="' + escapeAttr(item.color) + '" aria-label="Farbe">' +
+          '<button class="btn-icon btn-save-item" data-id="' + escapeAttr(item.id) + '" aria-label="Speichern">✓</button>' +
+          '<button class="btn-icon btn-cancel-edit" data-id="' + escapeAttr(item.id) + '" aria-label="Abbrechen">✕</button>';
+      } else {
+        div.className = 'setup-item-row';
+        div.draggable = true;
+        div.innerHTML =
+          '<span class="drag-handle" aria-hidden="true">⠿</span>' +
+          '<span class="setup-item-color" style="background:' + escapeAttr(item.color) + '"></span>' +
+          '<span class="setup-item-name">' + escapeHtml(item.name) + '</span>' +
+          '<span class="setup-item-price">' + formatCurrency(item.price) + '</span>' +
+          '<button class="btn-icon btn-remove-item" data-id="' + escapeAttr(item.id) + '" aria-label="Artikel entfernen">✕</button>';
+      }
       container.appendChild(div);
     });
+
+    // Auto-focus the name field when entering edit mode
+    if (editingItemId) {
+      const nameInput = container.querySelector('.edit-name');
+      if (nameInput) nameInput.focus();
+    }
   }
 
   // ─── Cashier Screen ──────────────────────────────────────────────────────

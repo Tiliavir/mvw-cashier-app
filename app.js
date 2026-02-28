@@ -9,6 +9,8 @@ const App = (function () {
   let pendingItems = [];
   // Drag-and-drop: ID of item being dragged
   let dragSrcId = null;
+  // Inline edit: ID of item currently being edited in setup list
+  let editingItemId = null;
 
   // ─── Init ───────────────────────────────────────────────────────────────────
   function init() {
@@ -27,8 +29,9 @@ const App = (function () {
   // ─── Navigation ─────────────────────────────────────────────────────────────
   function showSetup() {
     pendingItems = [];
+    editingItemId = null;
     UI.renderSetupScreen();
-    UI.renderSetupItems(pendingItems);
+    UI.renderSetupItems(pendingItems, editingItemId);
   }
 
   function showCashier() {
@@ -79,7 +82,8 @@ const App = (function () {
 
       const item = Models.createItem(name, price, color);
       pendingItems.push(item);
-      UI.renderSetupItems(pendingItems);
+      editingItemId = null;
+      UI.renderSetupItems(pendingItems, editingItemId);
 
       // Reset input fields
       if (nameInput) nameInput.value = '';
@@ -94,7 +98,52 @@ const App = (function () {
       if (!btn) return;
       const id = btn.dataset.id;
       pendingItems = pendingItems.filter(function (i) { return i.id !== id; });
-      UI.renderSetupItems(pendingItems);
+      editingItemId = null;
+      UI.renderSetupItems(pendingItems, editingItemId);
+    });
+
+    // Inline edit: click row to enter edit mode; save / cancel
+    on('setup-items-list', 'click', function (e) {
+      // Save button
+      if (e.target.closest('.btn-save-item')) {
+        const btn = e.target.closest('.btn-save-item');
+        const id = btn.dataset.id;
+        const container = document.getElementById('setup-items-list');
+        const row = container ? container.querySelector('[data-id="' + id + '"]') : null;
+        if (!row) return;
+        const nameInput = row.querySelector('.edit-name');
+        const priceInput = row.querySelector('.edit-price');
+        const colorInput = row.querySelector('.edit-color');
+        const name = nameInput ? nameInput.value.trim() : '';
+        const price = priceInput ? priceInput.value : '';
+        const color = colorInput ? colorInput.value : '#cccccc';
+        if (!name) { alert('Bitte Artikelname eingeben.'); return; }
+        const idx = pendingItems.findIndex(function (i) { return i.id === id; });
+        if (idx >= 0) {
+          pendingItems[idx] = Object.assign({}, pendingItems[idx], {
+            name: name,
+            price: Models.safeParseFloat(price),
+            color: color,
+          });
+        }
+        editingItemId = null;
+        UI.renderSetupItems(pendingItems, editingItemId);
+        return;
+      }
+
+      // Cancel button
+      if (e.target.closest('.btn-cancel-edit')) {
+        editingItemId = null;
+        UI.renderSetupItems(pendingItems, editingItemId);
+        return;
+      }
+
+      // Click on a non-edit row: enter edit mode (ignore remove button)
+      if (e.target.closest('.btn-remove-item')) return;
+      const row = e.target.closest('.setup-item-row');
+      if (!row || row.classList.contains('setup-item-edit')) return;
+      editingItemId = row.dataset.id;
+      UI.renderSetupItems(pendingItems, editingItemId);
     });
 
     // Drag-and-drop reordering of setup items
@@ -143,7 +192,7 @@ const App = (function () {
       if (srcIdx < 0 || dstIdx < 0) return;
       const moved = pendingItems.splice(srcIdx, 1)[0];
       pendingItems.splice(dstIdx, 0, moved);
-      UI.renderSetupItems(pendingItems);
+      UI.renderSetupItems(pendingItems, editingItemId);
       dragSrcId = null;
     });
 
