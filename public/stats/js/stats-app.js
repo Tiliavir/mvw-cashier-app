@@ -19,7 +19,7 @@ const StatsApp = (function () {
     if (contentEl) contentEl.hidden = false;
 
     const titleEl = document.getElementById('stats-event-name');
-    if (titleEl) titleEl.textContent = event.name + ' – ' + UI.formatDate(event.createdAt);
+    if (titleEl) titleEl.textContent = event.name + ' - ' + UI.formatDate(event.createdAt);
 
     renderStatCards(event);
     renderItemsTable(event);
@@ -27,7 +27,7 @@ const StatsApp = (function () {
 
     on('btn-back-settings', 'click', function () {
       sessionStorage.setItem('vt-direction', 'back');
-      location.href = '/settings/';
+      location.href = Paths.page('settings');
     });
   }
 

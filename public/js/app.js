@@ -11,7 +11,7 @@ const App = (function () {
     state = Store.loadState();
     const active = Store.getActiveEvent(state);
     if (!active) {
-      location.replace('/create/');
+      location.replace(Paths.page('create'));
       return;
     }
     const title = document.getElementById('cashier-event-name');
@@ -79,7 +79,7 @@ const App = (function () {
       updateTransactionBar();
     });
 
-    // Tip input – user may override auto-calculated tip
+    // Tip input - user may override auto-calculated tip
     on('tx-tip', 'input', function () {
       const active = Store.getActiveEvent(state);
       if (!active) return;
@@ -141,7 +141,7 @@ const App = (function () {
 
     // Settings navigation
     on('btn-settings', 'click', function () {
-      location.href = '/settings/';
+      location.href = Paths.page('settings');
     });
   }
 

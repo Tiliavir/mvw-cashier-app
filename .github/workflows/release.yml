@@ -34,10 +34,22 @@ jobs:
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
 
+      - name: Prepare Pages artifact
+        run: |
+          set -euo pipefail
+          cp -R public public-dist
+
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          BASE_PATH="/${REPO_NAME}/"
+
+          find public-dist -name '*.html' -type f -print0 | while IFS= read -r -d '' file; do
+            sed -i "s|<base href=\"/\">|<base href=\"${BASE_PATH}\">|g" "$file"
+          done
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: './public'
+          path: './public-dist'
 
       - name: Deploy to GitHub Pages
         id: deployment

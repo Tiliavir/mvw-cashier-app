@@ -1,4 +1,4 @@
-# CLAUDE.md – MVW Kassierer App
+# CLAUDE.md - MVW Kassierer App
 
 ## Project overview
 

@@ -64,7 +64,7 @@ const EditApp = (function () {
     // Back to settings (back direction)
     on('btn-back-settings', 'click', function () {
       sessionStorage.setItem('vt-direction', 'back');
-      location.href = '/settings/';
+      location.href = Paths.page('settings');
     });
 
     // Add item

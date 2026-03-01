@@ -6,13 +6,13 @@ A lightweight, browser-based cashier app for club events ("Vereinsfeste"). Built
 
 ## Features
 
-- 📦 **No frameworks** – plain HTML5, CSS, Vanilla JS (ES6)
-- 💾 **Offline-capable** – all data stored in `localStorage`
+- 📦 **No frameworks** - plain HTML5, CSS, Vanilla JS (ES6)
+- 💾 **Offline-capable** - all data stored in `localStorage`
 - 📱 **Mobile-first** responsive layout
-- 🎟️ **Event management** – create and close events
-- 🛒 **Item tiles** – color-coded, tap to add to cart
-- 💶 **Transaction tracking** – total, received amount, change, tip
-- 📊 **Settings & history** – view past events with revenue and transaction counts
+- 🎟️ **Event management** - create and close events
+- 🛒 **Item tiles** - color-coded, tap to add to cart
+- 💶 **Transaction tracking** - total, received amount, change, tip
+- 📊 **Settings & history** - view past events with revenue and transaction counts
 
 ---
 
@@ -29,6 +29,12 @@ cd public && python3 -m http.server
 ```
 
 Then open the shown local URL in your browser.
+
+### Base URL configuration
+
+The app is hardcoded with `<base href="/">` in all entry pages for local development.
+
+For GitHub Pages deployments, `.github/workflows/release.yml` automatically rewrites the base tag in the deployment artifact to `/<repo>/` (for example `/mvw-cashier-app/`).
 
 ### 2. Deploy to GitHub Pages
 
@@ -135,10 +141,10 @@ git push origin v1.0.0
 
 ## Known Limitations
 
-- **No multi-device sync** – data lives only in the browser's `localStorage`
-- **No server backup** – if browser data is cleared, all data is lost
-- **Single browser** – each device/browser has its own isolated data
-- **No export** – there is currently no CSV/JSON export (planned for future versions)
+- **No multi-device sync** - data lives only in the browser's `localStorage`
+- **No server backup** - if browser data is cleared, all data is lost
+- **Single browser** - each device/browser has its own isolated data
+- **No export** - there is currently no CSV/JSON export (planned for future versions)
 
 ---
 

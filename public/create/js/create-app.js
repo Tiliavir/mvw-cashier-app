@@ -269,7 +269,7 @@ const CreateApp = (function () {
       const event = Models.createEvent(name);
       event.items = pendingItems.slice();
       Store.addEvent(currentState, event);
-      location.href = '/';
+      location.href = Paths.page('');
     });
   }
 
