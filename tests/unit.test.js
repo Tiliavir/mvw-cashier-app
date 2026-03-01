@@ -217,6 +217,19 @@ test('calculateItemsSold ignores unknown itemIds', function () {
   assertEqual(Object.keys(sold).length, 0);
 });
 
+test('calculateItemsSold handles mix of known and unknown itemIds', function () {
+  const item = Models.createItem('Bier', '2.50', '#f80');
+  const event = Models.createEvent('Test');
+  event.items = [item];
+  event.transactions = [
+    { items: [{ itemId: item.id, quantity: 1 }, { itemId: 'ghost', quantity: 5 }], total: 2.5, tip: 0 },
+  ];
+  const sold = Models.calculateItemsSold(event);
+  assertEqual(Object.keys(sold).length, 1, 'only the known item is counted');
+  assertEqual(sold[item.id].quantity, 1);
+  assertClose(sold[item.id].revenue, 2.5);
+});
+
 // ─── Storage tests ─────────────────────────────────────────────────────────────
 console.log('\nStorage:');
 
