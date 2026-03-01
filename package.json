@@ -10,7 +10,7 @@
   },
   "scripts": {
     "lint": "stylelint style.css && eslint .",
-    "validate": "npx vnu --skip-non-html index.html",
+    "validate": "npx vnu --skip-non-html index.html create.html edit.html settings.html stats.html",
     "test": "node tests/unit.test.js",
     "build": "npm run lint && npm run validate && npm run test"
   },

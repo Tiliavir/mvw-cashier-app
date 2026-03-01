@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Statistik – MVW Kassierer">
+  <title>Statistik – MVW Kassierer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="full-page">
+
+  <header class="app-header">
+    <button id="btn-back-settings" class="btn btn-back" aria-label="Zurück zu Einstellungen">
+      ← Zurück
+    </button>
+    <h1 id="stats-event-name">Statistik</h1>
+  </header>
+
+  <div id="stats-error" class="error-page" hidden>
+    <p>Veranstaltung nicht gefunden.</p>
+    <a href="settings.html" class="btn btn-secondary">← Zurück zu Einstellungen</a>
+  </div>
+
+  <main id="stats-content" class="stats-main" hidden>
+
+    <div class="stat-cards" id="stat-cards"></div>
+
+    <section class="stats-section">
+      <h2 class="section-title">Verkaufte Artikel</h2>
+      <table class="items-table" id="items-table">
+        <thead>
+          <tr>
+            <th>Artikel</th>
+            <th>Anzahl</th>
+            <th>Umsatz</th>
+          </tr>
+        </thead>
+        <tbody id="items-table-body"></tbody>
+      </table>
+    </section>
+
+    <section class="stats-section">
+      <h2 class="section-title">Transaktionen</h2>
+      <div class="chart-container" id="stats-chart"></div>
+    </section>
+
+  </main>
+
+  <script src="models.js"></script>
+  <script src="storage.js"></script>
+  <script src="ui.js"></script>
+  <script src="stats-app.js"></script>
+</body>
+</html>

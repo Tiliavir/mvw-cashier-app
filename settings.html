@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Einstellungen – MVW Kassierer">
+  <title>Einstellungen – MVW Kassierer</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    (function () {
+      if (sessionStorage.getItem('vt-direction') === 'back') {
+        document.documentElement.dataset.direction = 'back';
+        sessionStorage.removeItem('vt-direction');
+      }
+    }());
+  </script>
+</head>
+<body class="full-page">
+
+  <header class="app-header">
+    <button id="btn-back-cashier" class="btn btn-back" aria-label="Zurück zur Kasse">
+      ← Zurück zur Kasse
+    </button>
+    <h1>Einstellungen</h1>
+  </header>
+
+  <main class="settings-main">
+
+    <section id="settings-active-section" class="settings-section">
+      <h2 class="section-title">Aktuelle Veranstaltung</h2>
+      <div class="info-grid">
+        <span class="info-label">Name</span>
+        <span id="settings-event-name" class="info-value">—</span>
+        <span class="info-label">Umsatz</span>
+        <span id="settings-revenue" class="info-value">0,00 €</span>
+        <span class="info-label">Trinkgeld</span>
+        <span id="settings-tip" class="info-value">0,00 €</span>
+        <span class="info-label">Transaktionen</span>
+        <span id="settings-tx-count" class="info-value">0</span>
+      </div>
+    </section>
+
+    <div class="settings-section settings-actions-top">
+      <button id="btn-close-event" class="btn btn-danger btn-full" disabled>
+        Veranstaltung beenden
+      </button>
+      <button id="btn-edit-event" class="btn btn-secondary btn-full" disabled>
+        Artikel bearbeiten
+      </button>
+      <a href="create.html" class="btn btn-secondary btn-full">
+        Neue Veranstaltung anlegen
+      </a>
+    </div>
+
+    <section class="settings-section">
+      <h2 class="section-title">Alle Veranstaltungen</h2>
+      <div id="all-events-list" class="all-events-list"></div>
+    </section>
+
+  </main>
+
+  <script src="models.js"></script>
+  <script src="storage.js"></script>
+  <script src="ui.js"></script>
+  <script src="settings-app.js"></script>
+</body>
+</html>

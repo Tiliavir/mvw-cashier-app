@@ -104,6 +104,25 @@ var Models = (function () {
     };
   }
 
+  function calculateItemsSold(event) {
+    const sold = {};
+    const itemsMap = buildItemsMap(event.items);
+    for (const tx of event.transactions) {
+      for (const txItem of tx.items) {
+        const item = itemsMap[txItem.itemId];
+        if (!item) continue;
+        if (!sold[txItem.itemId]) {
+          sold[txItem.itemId] = { name: item.name, quantity: 0, revenue: 0 };
+        }
+        sold[txItem.itemId].quantity += txItem.quantity;
+        sold[txItem.itemId].revenue = Math.round(
+          (sold[txItem.itemId].revenue + item.price * txItem.quantity) * 100
+        ) / 100;
+      }
+    }
+    return sold;
+  }
+
   return {
     generateId,
     createEvent,
@@ -115,6 +134,7 @@ var Models = (function () {
     calculateTip,
     buildItemsMap,
     calculateEventTotals,
+    calculateItemsSold,
   };
 }());
 
