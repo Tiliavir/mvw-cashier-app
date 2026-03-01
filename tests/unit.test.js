@@ -3,7 +3,7 @@
  * Unit tests for models.js and storage.js (Node.js compatible, no test framework needed)
  */
 
-const Models = require('../public/shared/js/models.js');
+const Models = require('../src/js/shared/models.js');
 
 // Minimal localStorage stub for storage.js
 global.localStorage = {
@@ -13,7 +13,7 @@ global.localStorage = {
   removeItem(key) { delete this._store[key]; },
 };
 
-const Storage = require('../public/shared/js/storage.js');
+const Storage = require('../src/js/shared/storage.js');
 
 // ─── Test runner ──────────────────────────────────────────────────────────────
 let passed = 0;

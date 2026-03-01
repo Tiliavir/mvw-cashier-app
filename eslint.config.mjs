@@ -4,7 +4,7 @@ import globals from "globals";
 export default [
   js.configs.recommended,
   {
-    files: ["public/**/*.js"],
+    files: ["src/js/**/*.js"],
     languageOptions: {
       sourceType: "script",
       globals: {
@@ -18,7 +18,7 @@ export default [
   },
   {
     // page scripts consume the namespaces defined in the other script files
-    files: ["public/js/app.js", "public/*/js/*-app.js"],
+    files: ["src/js/app.js", "src/js/*/create-app.js", "src/js/*/edit-app.js", "src/js/*/settings-app.js", "src/js/*/stats-app.js"],
     languageOptions: {
       globals: {
         Models: "readonly",
@@ -38,6 +38,15 @@ export default [
     },
   },
   {
-    ignores: ["node_modules/"],
+    ignores: ["node_modules/", "public/**/*.js"],
+  },
+  {
+    files: ["scripts/**/*.js", "postcss.config.js"],
+    languageOptions: {
+      sourceType: "commonjs",
+      globals: {
+        ...globals.node,
+      },
+    },
   },
 ];

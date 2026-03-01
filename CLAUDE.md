@@ -18,11 +18,11 @@ The app is structured as a **Multi-Page Application (MPA)** with five pages:
 
 ### Shared JS modules (loaded via `<script>` tags)
 
-- **`public/shared/js/models.js`** — Pure model factories and calculation functions. Exports `Models` namespace.
-- **`public/shared/js/storage.js`** — localStorage read/write, event/item/transaction operations. Exports `Store` namespace.
-- **`public/shared/js/ui.js`** — Shared UI helpers: `renderSetupItems`, `renderItemGrid`, formatting. Exports `UI` namespace.
+- **`src/js/shared/models.js`** — Pure model factories and calculation functions. Exports `Models` namespace.
+- **`src/js/shared/storage.js`** — localStorage read/write, event/item/transaction operations. Exports `Store` namespace.
+- **`src/js/shared/ui.js`** — Shared UI helpers: `renderSetupItems`, `renderItemGrid`, formatting. Exports `UI` namespace.
 
-Each page script (e.g. `public/create/js/create-app.js`) uses the `Models`, `Store`, and `UI` globals.
+Each page script (e.g. `src/js/create/create-app.js`) uses the `Models`, `Store`, and `UI` globals. Compiled/minified output goes to `public/`.
 
 ## Key concepts
 
@@ -80,11 +80,26 @@ function onDropReorder(srcId, dstId) {
 
 ```
 /
-├── public/
+├── src/                    # Source files (edit these, not public/)
+│   ├── js/
+│   │   ├── app.js              # Cashier page logic (source)
+│   │   ├── create/create-app.js
+│   │   ├── edit/edit-app.js
+│   │   ├── settings/settings-app.js
+│   │   ├── stats/stats-app.js
+│   │   └── shared/
+│   │       ├── models.js       # Model factories + calculations
+│   │       ├── storage.js      # localStorage operations
+│   │       ├── ui.js           # Shared UI helpers
+│   │       └── paths.js        # URL helpers
+│   └── scss/
+│       └── style.scss          # All styles (SCSS source)
+├── public/                 # Compiled output + static HTML (served by GitHub Pages)
 │   ├── index.html          # Cashier (redirects to /create/ if no active event)
+│   ├── favicon.svg         # App icon
 │   ├── create/
 │   │   ├── index.html      # New event creation
-│   │   └── js/create-app.js
+│   │   └── js/create-app.js  (minified, compiled from src/)
 │   ├── edit/
 │   │   ├── index.html      # Edit event items (URL param: ?id=<eventId>)
 │   │   └── js/edit-app.js
@@ -94,13 +109,13 @@ function onDropReorder(srcId, dstId) {
 │   ├── stats/
 │   │   ├── index.html      # Statistics for an event (URL param: ?id=<eventId>)
 │   │   └── js/stats-app.js
-│   ├── css/style.css       # All styles incl. view transitions
-│   ├── js/app.js           # Cashier page logic
-│   └── shared/js/
-│       ├── models.js       # Model factories + calculations (Models namespace)
-│       ├── storage.js      # localStorage operations (Store namespace)
-│       └── ui.js           # Shared UI rendering helpers (UI namespace)
-├── CLAUDE.md           # This file
+│   ├── css/style.css       # Compiled+minified CSS (from src/scss/style.scss)
+│   ├── js/app.js           # Minified (from src/js/app.js)
+│   └── shared/js/          # Minified shared modules
+├── scripts/
+│   └── build-js.js         # JS minification script (terser)
+├── postcss.config.js       # PostCSS: autoprefixer + cssnano
+├── CLAUDE.md               # This file
 ├── docs/
 │   ├── issue-14-mpa-refactor.md
 │   └── next-steps.md
@@ -117,19 +132,26 @@ npm install
 ### Lint, validate, test
 
 ```bash
-# Run all checks
+# Run all checks (compile + lint + validate + test)
 npm run build
+
+# Compile only (SCSS → CSS, JS minification)
+npm run compile
 
 # Individual checks
 node tests/unit.test.js                          # unit tests
-npx eslint .                                     # JS linting
-npx stylelint public/css/style.css               # CSS linting
+npx eslint .                                     # JS linting (src/js/)
+npx stylelint src/scss/style.scss               # SCSS linting
 npx vnu --skip-non-html public/index.html public/create/index.html public/edit/index.html public/settings/index.html public/stats/index.html  # HTML validation
 ```
 
-### No build step
+### Build pipeline
 
-This is a plain HTML/CSS/JS project — serve the `public/` directory with any static file server:
+Source files live in `src/`. The `npm run compile` step produces optimised output in `public/`:
+- `src/scss/style.scss` → (sass + PostCSS autoprefixer + cssnano) → `public/css/style.css`
+- `src/js/**/*.js` → (terser) → `public/**/*.js`
+
+Serve the `public/` directory with any static file server:
 
 ```bash
 npx serve public
