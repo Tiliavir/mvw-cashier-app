@@ -11,7 +11,7 @@ const App = (function () {
     state = Store.loadState();
     const active = Store.getActiveEvent(state);
     if (!active) {
-      location.replace('create.html');
+      location.replace('/create/');
       return;
     }
     const title = document.getElementById('cashier-event-name');
@@ -46,7 +46,7 @@ const App = (function () {
       if (!tile) return;
       const id = tile.dataset.id;
       const now = Date.now();
-      if (tileLastClick[id] && now - tileLastClick[id] < 300) return;
+      if (tileLastClick[id] && now - tileLastClick[id] < 150) return;
       tileLastClick[id] = now;
       if (e.target.closest('.tile-qty')) {
         if (cart[id] > 1) {
@@ -141,7 +141,7 @@ const App = (function () {
 
     // Settings navigation
     on('btn-settings', 'click', function () {
-      location.href = 'settings.html';
+      location.href = '/settings/';
     });
   }
 

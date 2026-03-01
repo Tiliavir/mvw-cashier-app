@@ -4,7 +4,7 @@ import globals from "globals";
 export default [
   js.configs.recommended,
   {
-    files: ["*.js"],
+    files: ["public/**/*.js"],
     languageOptions: {
       sourceType: "script",
       globals: {
@@ -18,7 +18,7 @@ export default [
   },
   {
     // page scripts consume the namespaces defined in the other script files
-    files: ["app.js", "*-app.js"],
+    files: ["public/js/app.js", "public/*/js/*-app.js"],
     languageOptions: {
       globals: {
         Models: "readonly",

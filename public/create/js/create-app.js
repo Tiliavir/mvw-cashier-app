@@ -1,71 +1,55 @@
 'use strict';
 
-// ─── Edit Page ────────────────────────────────────────────────────────────────
-const EditApp = (function () {
-  let state = null;
-  let eventId = null;
+// ─── Create Page ──────────────────────────────────────────────────────────────
+const CreateApp = (function () {
+  let pendingItems = [];
   let editingItemId = null;
   let dragSrcId = null;
   let touchDragSrcId = null;
   let touchClone = null;
 
+  const EXAMPLE_ITEMS = [
+    { name: 'Softdrinks', price: 2.00, color: '#3498db' },
+    { name: 'Bier',       price: 2.50, color: '#e67e22' },
+    { name: 'Wasser',     price: 1.50, color: '#85c1e9' },
+    { name: 'Wein',       price: 3.00, color: '#9b59b6' },
+    { name: 'Schorle',    price: 2.00, color: '#27ae60' },
+    { name: 'Pfand+',     price: 2.00, color: '#95a5a6' },
+    { name: 'Pfand-',     price: -2.00, color: '#95a5a6' },
+    { name: 'Grillwurst', price: 3.50, color: '#e67e22' },
+    { name: 'Bratwurst',  price: 3.00, color: '#d35400' },
+    { name: 'Pommes',     price: 3.00, color: '#f1c40f' },
+    { name: 'Steak',      price: 6.00, color: '#795548' },
+    { name: 'Kaffee',     price: 2.00, color: '#4e342e' },
+    { name: 'Kuchen',     price: 2.50, color: '#d7ccc8' },
+    { name: 'Torte',      price: 3.00, color: '#f48fb1' },
+  ];
+
   // ─── Init ─────────────────────────────────────────────────────────────────
   function init() {
-    eventId = new URLSearchParams(location.search).get('id');
-    state = Store.loadState();
-    const event = state.events.find(function (e) { return e.id === eventId; });
-
-    if (!event) {
-      const errEl = document.getElementById('edit-error');
-      if (errEl) errEl.hidden = false;
-      return;
-    }
-
-    const contentEl = document.getElementById('edit-content');
-    if (contentEl) contentEl.hidden = false;
-
-    const titleEl = document.getElementById('edit-event-name');
-    if (titleEl) titleEl.textContent = event.name;
-
     renderItems();
     bindEvents();
   }
 
-  // ─── Current event ────────────────────────────────────────────────────────
-  function currentEvent() {
-    return state.events.find(function (e) { return e.id === eventId; }) || null;
-  }
-
   // ─── Render ───────────────────────────────────────────────────────────────
   function renderItems() {
-    const event = currentEvent();
-    if (!event) return;
-    UI.renderSetupItems(event.items, editingItemId);
+    UI.renderSetupItems(pendingItems, editingItemId);
   }
 
   // ─── Reorder helper ───────────────────────────────────────────────────────
   function onDropReorder(srcId, dstId) {
-    const event = currentEvent();
-    if (!event || !srcId || srcId === dstId) return;
-    const items = event.items.slice();
-    const srcIdx = items.findIndex(function (i) { return i.id === srcId; });
-    const dstIdx = items.findIndex(function (i) { return i.id === dstId; });
+    if (!srcId || srcId === dstId) return;
+    const srcIdx = pendingItems.findIndex(function (i) { return i.id === srcId; });
+    const dstIdx = pendingItems.findIndex(function (i) { return i.id === dstId; });
     if (srcIdx < 0 || dstIdx < 0) return;
-    const moved = items.splice(srcIdx, 1)[0];
-    items.splice(dstIdx, 0, moved);
-    state = Store.reorderItemsInEvent(state, eventId, items);
+    const moved = pendingItems.splice(srcIdx, 1)[0];
+    pendingItems.splice(dstIdx, 0, moved);
     renderItems();
   }
 
   // ─── Bind events ─────────────────────────────────────────────────────────
   function bindEvents() {
     const container = document.getElementById('setup-items-list');
-
-    // Back to settings (back direction)
-    on('btn-back-settings', 'click', function () {
-      sessionStorage.setItem('vt-direction', 'back');
-      location.href = 'settings.html';
-    });
 
     // Add item
     on('btn-add-item', 'click', function () {
@@ -78,7 +62,7 @@ const EditApp = (function () {
       if (!name) { alert('Bitte Artikelname eingeben.'); return; }
       if (price === '') { alert('Bitte Preis eingeben.'); return; }
       const item = Models.createItem(name, price, color);
-      state = Store.addItemToEvent(state, eventId, item);
+      pendingItems.push(item);
       editingItemId = null;
       renderItems();
       if (nameInput) nameInput.value = '';
@@ -87,35 +71,13 @@ const EditApp = (function () {
       if (nameInput) nameInput.focus();
     });
 
-    // Export
-    on('btn-export', 'click', function () {
-      const event = currentEvent();
-      if (!event) return;
-      const data = {
-        name: event.name,
-        items: event.items.map(function (it) {
-          return { name: it.name, price: it.price, color: it.color };
-        }),
-      };
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = event.name.replace(/[^a-z0-9äöüß]/gi, '_') + '.json';
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-
     // Item list interactions (delegated)
     if (container) {
       container.addEventListener('click', function (e) {
-        const event = currentEvent();
-        if (!event) return;
-
-        // Remove
+        // Remove item
         const removeBtn = e.target.closest('.btn-remove-item');
         if (removeBtn) {
-          state = Store.removeItemFromEvent(state, eventId, removeBtn.dataset.id);
+          pendingItems = pendingItems.filter(function (i) { return i.id !== removeBtn.dataset.id; });
           editingItemId = null;
           renderItems();
           return;
@@ -132,14 +94,13 @@ const EditApp = (function () {
           const colorInput = row.querySelector('.edit-color');
           const name = nameInput ? nameInput.value.trim() : '';
           if (!name) { alert('Bitte Artikelname eingeben.'); return; }
-          const item = event.items.find(function (i) { return i.id === id; });
-          if (item) {
-            const updated = Object.assign({}, item, {
+          const idx = pendingItems.findIndex(function (i) { return i.id === id; });
+          if (idx >= 0) {
+            pendingItems[idx] = Object.assign({}, pendingItems[idx], {
               name: name,
               price: Models.safeParseFloat(priceInput ? priceInput.value : '0'),
               color: colorInput ? colorInput.value : '#cccccc',
             });
-            state = Store.updateItemInEvent(state, eventId, updated);
           }
           editingItemId = null;
           renderItems();
@@ -252,6 +213,64 @@ const EditApp = (function () {
         touchDragSrcId = null;
       });
     }
+
+    // Example config
+    on('btn-example-config', 'click', function () {
+      pendingItems = EXAMPLE_ITEMS.map(function (cfg) {
+        return Models.createItem(cfg.name, cfg.price, cfg.color);
+      });
+      editingItemId = null;
+      renderItems();
+    });
+
+    // Import JSON
+    on('btn-import', 'click', function () {
+      const fileInput = document.getElementById('import-file');
+      if (fileInput) fileInput.click();
+    });
+
+    const fileInput = document.getElementById('import-file');
+    if (fileInput) {
+      fileInput.addEventListener('change', function () {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+          const errorEl = document.getElementById('import-error');
+          try {
+            const data = JSON.parse(ev.target.result);
+            if (!data || typeof data.name !== 'string' || !Array.isArray(data.items)) {
+              throw new Error('Ungültiges Format');
+            }
+            const nameInput = document.getElementById('event-name');
+            if (nameInput) nameInput.value = data.name;
+            pendingItems = data.items.map(function (it) {
+              return Models.createItem(it.name || '', it.price || 0, it.color || '#cccccc');
+            });
+            editingItemId = null;
+            renderItems();
+            if (errorEl) errorEl.textContent = '';
+          } catch (_e) {
+            if (errorEl) errorEl.textContent = 'Fehler beim Importieren: Ungültiges JSON-Format.';
+          }
+          fileInput.value = '';
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    // Start event
+    on('btn-start-event', 'click', function () {
+      const nameInput = document.getElementById('event-name');
+      const name = nameInput ? nameInput.value.trim() : '';
+      if (!name) { alert('Bitte Veranstaltungsname eingeben.'); return; }
+      if (pendingItems.length === 0) { alert('Bitte mindestens einen Artikel hinzufügen.'); return; }
+      const currentState = Store.loadState();
+      const event = Models.createEvent(name);
+      event.items = pendingItems.slice();
+      Store.addEvent(currentState, event);
+      location.href = '/';
+    });
   }
 
   // ─── Utility ──────────────────────────────────────────────────────────────
@@ -264,5 +283,5 @@ const EditApp = (function () {
 }());
 
 document.addEventListener('DOMContentLoaded', function () {
-  EditApp.init();
+  CreateApp.init();
 });
