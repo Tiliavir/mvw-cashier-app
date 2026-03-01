@@ -38,14 +38,13 @@ var Models = (function () {
     };
   }
 
-  function createTransaction(items, total, received, change, tip) {
+  function createTransaction(items, total, received, change) {
     return {
       timestamp: new Date().toISOString(),
       items: items,
       total: total,
       received: received,
       change: change,
-      tip: tip,
     };
   }
 
@@ -75,13 +74,6 @@ var Models = (function () {
     return change < 0 ? 0 : Math.round(change * 100) / 100;
   }
 
-  function calculateTip(total, received, change) {
-    const r = safeParseFloat(received);
-    if (r < 0) return 0;
-    const tip = r - total - change;
-    return tip < 0 ? 0 : Math.round(tip * 100) / 100;
-  }
-
   function buildItemsMap(items) {
     const map = {};
     for (const item of items) {
@@ -92,14 +84,11 @@ var Models = (function () {
 
   function calculateEventTotals(event) {
     let totalRevenue = 0;
-    let totalTip = 0;
     for (const tx of event.transactions) {
       totalRevenue += tx.total;
-      totalTip += tx.tip;
     }
     return {
       revenue: Math.round(totalRevenue * 100) / 100,
-      tip: Math.round(totalTip * 100) / 100,
       transactionCount: event.transactions.length,
     };
   }
@@ -131,7 +120,6 @@ var Models = (function () {
     safeParseFloat,
     calculateTotal,
     calculateChange,
-    calculateTip,
     buildItemsMap,
     calculateEventTotals,
     calculateItemsSold,

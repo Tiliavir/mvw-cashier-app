@@ -30,11 +30,9 @@ const App = (function () {
     const receivedInput = document.getElementById('tx-received');
     const received = receivedInput ? Models.safeParseFloat(receivedInput.value) : 0;
     const safeReceived = received < 0 ? 0 : received;
-    const change = Models.calculateChange(total, safeReceived);
-    const tip = Models.calculateTip(total, safeReceived, change);
     // Show negative change when underpaid; keep 0 when no amount entered yet
     const displayChange = safeReceived > 0 ? Math.round((safeReceived - total) * 100) / 100 : 0;
-    UI.renderTransactionBar(total, safeReceived, displayChange, tip);
+    UI.renderTransactionBar(total, safeReceived, displayChange);
   }
 
   // ─── Bind events ─────────────────────────────────────────────────────────
@@ -68,9 +66,7 @@ const App = (function () {
     on('btn-cancel-tx', 'click', function () {
       cart = {};
       const receivedInput = document.getElementById('tx-received');
-      const tipInput = document.getElementById('tx-tip');
       if (receivedInput) receivedInput.value = '';
-      if (tipInput) tipInput.value = '';
       const active = Store.getActiveEvent(state);
       if (active) UI.renderItemGrid(active.items, cart);
       updateTransactionBar();
@@ -79,26 +75,6 @@ const App = (function () {
     // Received input
     on('tx-received', 'input', function () {
       updateTransactionBar();
-    });
-
-    // Tip input - user may override auto-calculated tip
-    on('tx-tip', 'input', function () {
-      const active = Store.getActiveEvent(state);
-      if (!active) return;
-      const itemsMap = Models.buildItemsMap(active.items);
-      const total = Models.calculateTotal(cart, itemsMap);
-      const receivedInput = document.getElementById('tx-received');
-      const tipInput = document.getElementById('tx-tip');
-      const received = receivedInput ? Models.safeParseFloat(receivedInput.value) : 0;
-      const safeReceived = received < 0 ? 0 : received;
-      const manualTip = tipInput ? Models.safeParseFloat(tipInput.value) : 0;
-      const safeTip = manualTip < 0 ? 0 : manualTip;
-      const change = Math.max(0, Math.round((safeReceived - total - safeTip) * 100) / 100);
-      const changeEl = document.getElementById('tx-change');
-      if (changeEl) {
-        changeEl.textContent = UI.formatCurrency(change);
-        changeEl.classList.remove('tx-change-negative');
-      }
     });
 
     // Next transaction
@@ -112,19 +88,10 @@ const App = (function () {
       const itemsMap = Models.buildItemsMap(active.items);
       const total = Models.calculateTotal(cart, itemsMap);
       const receivedInput = document.getElementById('tx-received');
-      const tipInput = document.getElementById('tx-tip');
       const received = receivedInput ? Models.safeParseFloat(receivedInput.value) : 0;
       const safeReceived = received < 0 ? 0 : received;
 
-      const tipRaw = tipInput ? tipInput.value : '';
-      let tip, change;
-      if (tipRaw !== '') {
-        tip = Math.max(0, Models.safeParseFloat(tipRaw));
-        change = Math.max(0, Math.round((safeReceived - total - tip) * 100) / 100);
-      } else {
-        change = Models.calculateChange(total, safeReceived);
-        tip = Models.calculateTip(total, safeReceived, change);
-      }
+      const change = Models.calculateChange(total, safeReceived);
 
       const txItems = [];
       for (const itemId in cart) {
@@ -133,12 +100,11 @@ const App = (function () {
         }
       }
 
-      const tx = Models.createTransaction(txItems, total, safeReceived, change, tip);
+      const tx = Models.createTransaction(txItems, total, safeReceived, change);
       state = Store.addTransaction(state, active.id, tx);
 
       cart = {};
       if (receivedInput) receivedInput.value = '';
-      if (tipInput) tipInput.value = '';
       const updatedActive = Store.getActiveEvent(state);
       if (updatedActive) UI.renderItemGrid(updatedActive.items, cart);
       updateTransactionBar();

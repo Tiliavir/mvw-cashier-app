@@ -17,7 +17,6 @@ const SettingsApp = (function () {
     const active = Store.getActiveEvent(state);
     const nameEl = document.getElementById('settings-event-name');
     const revenueEl = document.getElementById('settings-revenue');
-    const tipEl = document.getElementById('settings-tip');
     const txCountEl = document.getElementById('settings-tx-count');
     const closeBtn = document.getElementById('btn-close-event');
 
@@ -25,13 +24,11 @@ const SettingsApp = (function () {
       const totals = Models.calculateEventTotals(active);
       if (nameEl) nameEl.textContent = active.name;
       if (revenueEl) revenueEl.textContent = UI.formatCurrency(totals.revenue);
-      if (tipEl) tipEl.textContent = UI.formatCurrency(totals.tip);
       if (txCountEl) txCountEl.textContent = String(totals.transactionCount);
       if (closeBtn) closeBtn.disabled = false;
     } else {
       if (nameEl) nameEl.textContent = '—';
       if (revenueEl) revenueEl.textContent = UI.formatCurrency(0);
-      if (tipEl) tipEl.textContent = UI.formatCurrency(0);
       if (txCountEl) txCountEl.textContent = '0';
       if (closeBtn) closeBtn.disabled = true;
     }
