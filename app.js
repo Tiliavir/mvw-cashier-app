@@ -37,11 +37,17 @@ const App = (function () {
 
   // ─── Bind events ─────────────────────────────────────────────────────────
   function bindEvents() {
+    // Per-tile debounce to prevent ghost-click double-counting on mobile
+    const tileLastClick = {};
+
     // Item grid click: tile adds item, qty badge reduces
     on('item-grid', 'click', function (e) {
       const tile = e.target.closest('.item-tile');
       if (!tile) return;
       const id = tile.dataset.id;
+      const now = Date.now();
+      if (tileLastClick[id] && now - tileLastClick[id] < 300) return;
+      tileLastClick[id] = now;
       if (e.target.closest('.tile-qty')) {
         if (cart[id] > 1) {
           cart[id]--;
