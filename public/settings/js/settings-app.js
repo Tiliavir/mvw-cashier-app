@@ -83,12 +83,12 @@ const SettingsApp = (function () {
 
       const editLink = document.createElement('a');
       editLink.className = 'all-event-link';
-      editLink.href = '/edit/?id=' + encodeURIComponent(event.id);
+      editLink.href = Paths.page('edit', { id: event.id });
       editLink.textContent = 'Bearbeiten';
 
       const statsLink = document.createElement('a');
       statsLink.className = 'all-event-link';
-      statsLink.href = '/stats/?id=' + encodeURIComponent(event.id);
+      statsLink.href = Paths.page('stats', { id: event.id });
       statsLink.textContent = 'Statistik';
 
       actionsDiv.appendChild(editLink);
@@ -108,7 +108,7 @@ const SettingsApp = (function () {
     // Back to cashier (back direction)
     on('btn-back-cashier', 'click', function () {
       sessionStorage.setItem('vt-direction', 'back');
-      location.href = '/';
+      location.href = Paths.page('');
     });
 
     // Close event

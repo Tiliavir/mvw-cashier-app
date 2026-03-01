@@ -24,6 +24,7 @@ export default [
         Models: "readonly",
         Store: "readonly",
         UI: "readonly",
+        Paths: "readonly",
       },
     },
   },
