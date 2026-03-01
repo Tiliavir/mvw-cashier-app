@@ -164,11 +164,11 @@ const StatsApp = (function () {
     axisY.setAttribute('stroke-width', '1');
     svg.appendChild(axisY);
 
-    // Y-axis tick labels (4 ticks: 0, 25%, 50%, 75%, 100% of maxVal)
-    const yTicks = 4;
-    for (let t = 0; t <= yTicks; t++) {
-      const tickVal = Math.round((maxVal * t / yTicks) * 100) / 100;
-      const tickY = padding.top + innerH - (t / yTicks) * innerH;
+    // Y-axis tick labels (4 intervals → 5 ticks: 0%, 25%, 50%, 75%, 100% of maxVal)
+    const yTickIntervals = 4;
+    for (let t = 0; t <= yTickIntervals; t++) {
+      const tickVal = Math.round((maxVal * t / yTickIntervals) * 100) / 100;
+      const tickY = padding.top + innerH - (t / yTickIntervals) * innerH;
       const tickLabel = document.createElementNS(NS, 'text');
       tickLabel.setAttribute('x', String(padding.left - 6));
       tickLabel.setAttribute('y', String(tickY + 4));

@@ -32,6 +32,7 @@ const App = (function () {
     const safeReceived = received < 0 ? 0 : received;
     const change = Models.calculateChange(total, safeReceived);
     const tip = Models.calculateTip(total, safeReceived, change);
+    // Show negative change when underpaid; keep 0 when no amount entered yet
     const displayChange = safeReceived > 0 ? Math.round((safeReceived - total) * 100) / 100 : 0;
     UI.renderTransactionBar(total, safeReceived, displayChange, tip);
   }
