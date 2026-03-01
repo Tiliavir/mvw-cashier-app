@@ -46,7 +46,7 @@ const App = (function () {
       if (!tile) return;
       const id = tile.dataset.id;
       const now = Date.now();
-      if (tileLastClick[id] && now - tileLastClick[id] < 300) return;
+      if (tileLastClick[id] && now - tileLastClick[id] < 150) return;
       tileLastClick[id] = now;
       if (e.target.closest('.tile-qty')) {
         if (cart[id] > 1) {

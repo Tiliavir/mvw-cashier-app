@@ -23,7 +23,7 @@ const StatsApp = (function () {
 
     renderStatCards(event);
     renderItemsTable(event);
-    renderChart(event);
+    renderCharts(event);
 
     on('btn-back-settings', 'click', function () {
       sessionStorage.setItem('vt-direction', 'back');
@@ -92,79 +92,112 @@ const StatsApp = (function () {
     });
   }
 
-  // ─── Transactions bar chart ───────────────────────────────────────────────
-  function renderChart(event) {
-    const container = document.getElementById('stats-chart');
-    if (!container) return;
-    const transactions = event.transactions;
+  // ─── Time-series charts ──────────────────────────────────────────────────
+  function renderCharts(event) {
+    const countContainer = document.getElementById('stats-chart-count');
+    const amountContainer = document.getElementById('stats-chart-amount');
+    if (!countContainer || !amountContainer) return;
 
+    const transactions = event.transactions;
     if (transactions.length === 0) {
-      container.innerHTML = '<p class="empty-hint">Keine Transaktionen vorhanden.</p>';
+      countContainer.innerHTML = '<p class="empty-hint">Keine Transaktionen vorhanden.</p>';
+      amountContainer.innerHTML = '<p class="empty-hint">Keine Transaktionen vorhanden.</p>';
       return;
     }
 
-    const MAX_INDIVIDUAL = 50;
-    let data;
+    const hourMap = {};
+    transactions.forEach(function (tx) {
+      const date = new Date(tx.timestamp);
+      const key = date.toISOString().slice(0, 13);
+      if (!hourMap[key]) {
+        hourMap[key] = { label: key.slice(11) + ':00', count: 0, amount: 0 };
+      }
+      hourMap[key].count += 1;
+      hourMap[key].amount = Math.round((hourMap[key].amount + tx.total) * 100) / 100;
+    });
 
-    if (transactions.length > MAX_INDIVIDUAL) {
-      // Group by hour
-      const hourMap = {};
-      transactions.forEach(function (tx) {
-        const h = new Date(tx.timestamp).getHours();
-        const key = (h < 10 ? '0' : '') + h + ':00';
-        hourMap[key] = Math.round(((hourMap[key] || 0) + tx.total) * 100) / 100;
-      });
-      data = Object.keys(hourMap).sort().map(function (key) {
-        return { label: key, value: hourMap[key] };
-      });
-    } else {
-      data = transactions.map(function (tx, i) {
-        return { label: String(i + 1), value: tx.total };
-      });
-    }
+    const keys = Object.keys(hourMap).sort();
+    const countData = keys.map(function (key) {
+      return { label: hourMap[key].label, value: hourMap[key].count };
+    });
+    const amountData = keys.map(function (key) {
+      return { label: hourMap[key].label, value: hourMap[key].amount };
+    });
 
-    const maxVal = data.reduce(function (m, d) { return d.value > m ? d.value : m; }, 0);
-    const barH = 20;
-    const gap = 4;
-    const labelW = 30;
-    const chartW = 260;
-    const svgW = labelW + chartW + 4;
-    const svgH = data.length * (barH + gap);
+    drawLineChart(countContainer, countData, 'Anzahl Transaktionen pro Stunde');
+    drawLineChart(amountContainer, amountData, 'Umsatz pro Stunde');
+  }
+
+  function drawLineChart(container, data, ariaLabel) {
+    container.innerHTML = '';
 
     const NS = 'http://www.w3.org/2000/svg';
+    const width = 600;
+    const height = 220;
+    const padding = { top: 16, right: 12, bottom: 36, left: 36 };
+    const innerW = width - padding.left - padding.right;
+    const innerH = height - padding.top - padding.bottom;
+    const maxVal = Math.max(1, data.reduce(function (m, d) { return d.value > m ? d.value : m; }, 0));
+    const xStep = data.length > 1 ? innerW / (data.length - 1) : 0;
+
     const svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('viewBox', '0 0 ' + svgW + ' ' + svgH);
+    svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
     svg.setAttribute('width', '100%');
     svg.setAttribute('role', 'img');
-    svg.setAttribute('aria-label', 'Transaktions-Übersicht');
+    svg.setAttribute('aria-label', ariaLabel);
 
+    const axisX = document.createElementNS(NS, 'line');
+    axisX.setAttribute('x1', String(padding.left));
+    axisX.setAttribute('y1', String(padding.top + innerH));
+    axisX.setAttribute('x2', String(padding.left + innerW));
+    axisX.setAttribute('y2', String(padding.top + innerH));
+    axisX.setAttribute('stroke', '#bbb');
+    axisX.setAttribute('stroke-width', '1');
+    svg.appendChild(axisX);
+
+    const axisY = document.createElementNS(NS, 'line');
+    axisY.setAttribute('x1', String(padding.left));
+    axisY.setAttribute('y1', String(padding.top));
+    axisY.setAttribute('x2', String(padding.left));
+    axisY.setAttribute('y2', String(padding.top + innerH));
+    axisY.setAttribute('stroke', '#bbb');
+    axisY.setAttribute('stroke-width', '1');
+    svg.appendChild(axisY);
+
+    let points = '';
     data.forEach(function (d, i) {
-      const y = i * (barH + gap);
-      const barW = maxVal > 0 ? Math.round((d.value / maxVal) * chartW) : 0;
+      const x = padding.left + xStep * i;
+      const y = padding.top + innerH - (d.value / maxVal) * innerH;
+      points += x + ',' + y + ' ';
 
-      const labelEl = document.createElementNS(NS, 'text');
-      labelEl.setAttribute('x', String(labelW - 4));
-      labelEl.setAttribute('y', String(y + barH / 2 + 4));
-      labelEl.setAttribute('text-anchor', 'end');
-      labelEl.setAttribute('font-size', '10');
-      labelEl.setAttribute('fill', '#888');
-      labelEl.textContent = d.label;
-
-      const rect = document.createElementNS(NS, 'rect');
-      rect.setAttribute('x', String(labelW));
-      rect.setAttribute('y', String(y));
-      rect.setAttribute('width', String(barW));
-      rect.setAttribute('height', String(barH));
-      rect.setAttribute('fill', '#3498db');
-      rect.setAttribute('rx', '3');
-
+      const dot = document.createElementNS(NS, 'circle');
+      dot.setAttribute('cx', String(x));
+      dot.setAttribute('cy', String(y));
+      dot.setAttribute('r', '3');
+      dot.setAttribute('fill', '#3498db');
       const title = document.createElementNS(NS, 'title');
-      title.textContent = d.label + ': ' + UI.formatCurrency(d.value);
-      rect.appendChild(title);
+      title.textContent = d.label + ': ' + d.value;
+      dot.appendChild(title);
+      svg.appendChild(dot);
 
-      svg.appendChild(labelEl);
-      svg.appendChild(rect);
+      if (i === 0 || i === data.length - 1 || i % 2 === 0) {
+        const label = document.createElementNS(NS, 'text');
+        label.setAttribute('x', String(x));
+        label.setAttribute('y', String(height - 10));
+        label.setAttribute('text-anchor', 'middle');
+        label.setAttribute('font-size', '10');
+        label.setAttribute('fill', '#888');
+        label.textContent = d.label;
+        svg.appendChild(label);
+      }
     });
+
+    const polyline = document.createElementNS(NS, 'polyline');
+    polyline.setAttribute('points', points.trim());
+    polyline.setAttribute('fill', 'none');
+    polyline.setAttribute('stroke', '#3498db');
+    polyline.setAttribute('stroke-width', '2');
+    svg.insertBefore(polyline, svg.childNodes[2] || null);
 
     container.appendChild(svg);
   }
