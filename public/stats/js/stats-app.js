@@ -27,7 +27,7 @@ const StatsApp = (function () {
 
     on('btn-back-settings', 'click', function () {
       sessionStorage.setItem('vt-direction', 'back');
-      location.href = 'settings.html';
+      location.href = '/settings/';
     });
   }
 

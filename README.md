@@ -18,14 +18,22 @@ A lightweight, browser-based cashier app for club events ("Vereinsfeste"). Built
 
 ## Getting Started
 
-### 1. Open directly in the browser
+### 1. Serve locally
 
-Just open `index.html` in any modern browser — no server or build step required.
+Serve the `public/` folder with any static file server:
+
+```bash
+npx serve public
+# or
+cd public && python3 -m http.server
+```
+
+Then open the shown local URL in your browser.
 
 ### 2. Deploy to GitHub Pages
 
 1. Go to your repository **Settings → Pages**
-2. Set Source to **Deploy from a branch** → `main` / root (`/`)
+2. Set Source to **Deploy from a branch** → `main` / `public` folder
 3. Save. Your app will be available at `https://<username>.github.io/<repo>/`
 
 Alternatively, push a tag (`v*`) to trigger the release workflow, which automatically deploys to GitHub Pages.
@@ -36,12 +44,26 @@ Alternatively, push a tag (`v*`) to trigger the release workflow, which automati
 
 ```
 /
-├── index.html          # Main entry point
-├── style.css           # Mobile-first responsive styles
-├── models.js           # Pure data model + calculation functions
-├── storage.js          # LocalStorage read/write operations
-├── ui.js               # DOM rendering helpers
-├── app.js              # Application logic and event handling
+├── public/
+│   ├── index.html      # Cashier page (/)
+│   ├── create/
+│   │   ├── index.html  # Create page (/create/)
+│   │   └── js/create-app.js
+│   ├── edit/
+│   │   ├── index.html  # Edit page (/edit/?id=...)
+│   │   └── js/edit-app.js
+│   ├── settings/
+│   │   ├── index.html  # Settings page (/settings/)
+│   │   └── js/settings-app.js
+│   ├── stats/
+│   │   ├── index.html  # Stats page (/stats/?id=...)
+│   │   └── js/stats-app.js
+│   ├── css/style.css   # Mobile-first responsive styles
+│   ├── js/app.js       # Cashier logic
+│   └── shared/js/
+│       ├── models.js   # Pure data model + calculation functions
+│       ├── storage.js  # LocalStorage read/write operations
+│       └── ui.js       # DOM rendering helpers
 ├── package.json        # Dev dependencies (linting + HTML validation only)
 ├── eslint.config.mjs   # ESLint flat config for Vanilla JS
 ├── .stylelintrc        # Stylelint config (stylelint-config-standard)

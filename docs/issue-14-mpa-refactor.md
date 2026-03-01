@@ -27,10 +27,10 @@ Fixe den bug, dass drag and drop mit Touch nicht funktioniert.
 - [x] Add a CLAUDE.md describing the project, its architecture, concept and ideas for later reference.
 
 ### 1) Pages / MPA structure
-- [x] Define the set of pages after the refactor (`index.html`, `settings.html`, `create.html`, `edit.html`, `stats.html`).
-- [x] Extract the **initial creation** form into its own HTML page (`create.html`).
+- [x] Define the set of pages after the refactor (`public/index.html`, `public/settings/index.html`, `public/create/index.html`, `public/edit/index.html`, `public/stats/index.html`).
+- [x] Extract the **initial creation** form into its own HTML page (`public/create/index.html`).
 - [x] On the initial creation page, allow the event import with a json upload.
-- [x] Extract the **edit** form into its own HTML page (`edit.html`).
+- [x] Extract the **edit** form into its own HTML page (`public/edit/index.html`).
 - [x] The edit page identifies the event to be edited with a parameter in the URL (`?id=<eventId>`).
 - [x] When the to-be-edited event does not exist, an error is displayed explaining the issue and guiding the user back to the referer URL.
 - [x] Settings can be exported from the edit page.
@@ -46,7 +46,7 @@ Fixe den bug, dass drag and drop mit Touch nicht funktioniert.
 - [x] The existing storage of events in the local storage is not affected by this change.
 
 ### 4) Statistics page
-- [x] `stats.html` page is reachable from the settings page (event list → Statistik link).
+- [x] `public/stats/index.html` page is reachable from the settings page (event list → Statistik link).
 - [x] In the event list, the user has an option to either edit an event or to view its stats.
 - [x] The stats page shows: total revenue, tip, number of transactions, items sold per product, transactions over time (SVG bar chart).
 - [x] When the stats page is opened with a non-existing event, an error is displayed with a back link.
@@ -55,11 +55,11 @@ Fixe den bug, dass drag and drop mit Touch nicht funktioniert.
 - [x] The edit page and the create page have drag-and-drop feature to reorder items.
 - [x] Touch drag-and-drop is now implemented using `touchstart`/`touchmove`/`touchend` with `document.elementFromPoint`.
 
-### 6) Initial Page (create.html)
+### 6) Initial Page (public/create/index.html)
 - [x] Pfand hint: users are shown that "Pfand" can be entered with a negative value.
 - [x] Example configuration can be loaded (Softdrinks, Bier, Wasser, Wein, Schorle, Pfand+, Pfand-, Grillwurst, Bratwurst, Pommes, Steak, Kaffee, Kuchen, Torte).
 - [x] JSON import via file upload on the create page.
 
-### 7) Main Page (index.html – cashier)
+### 7) Main Page (public/index.html – cashier)
 - [x] Users can reduce the amount of a selected item (click qty badge).
 - [x] Cancel and next transaction buttons are side-by-side: cancel (red, left) and next (green, right).

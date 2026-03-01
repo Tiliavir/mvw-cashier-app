@@ -2,7 +2,7 @@
 
 ## 1. Landing page vs. direct cashier
 
-Should `index.html` always be the cashier, or should it be a landing/redirect page that routes based on app state? Currently it redirects to `create.html` if no active event is found.
+Should `index.html` always be the cashier, or should it be a landing/redirect page that routes based on app state? Currently it redirects to `/create/` if no active event is found.
 
 ## 2. Component reuse via Hugo
 

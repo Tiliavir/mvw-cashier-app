@@ -9,8 +9,8 @@
     "url": "https://github.com/Tiliavir/mvw-cashier-app.git"
   },
   "scripts": {
-    "lint": "stylelint style.css && eslint .",
-    "validate": "npx vnu --skip-non-html index.html create.html edit.html settings.html stats.html",
+    "lint": "stylelint public/css/style.css && eslint .",
+    "validate": "npx vnu --skip-non-html public/index.html public/create/index.html public/edit/index.html public/settings/index.html public/stats/index.html",
     "test": "node tests/unit.test.js",
     "build": "npm run lint && npm run validate && npm run test"
   },

@@ -11,7 +11,7 @@ const App = (function () {
     state = Store.loadState();
     const active = Store.getActiveEvent(state);
     if (!active) {
-      location.replace('create.html');
+      location.replace('/create/');
       return;
     }
     const title = document.getElementById('cashier-event-name');
@@ -141,7 +141,7 @@ const App = (function () {
 
     // Settings navigation
     on('btn-settings', 'click', function () {
-      location.href = 'settings.html';
+      location.href = '/settings/';
     });
   }
 
