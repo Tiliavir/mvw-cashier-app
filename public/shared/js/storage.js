@@ -120,6 +120,17 @@ var Store = (function () {
     return newState;
   }
 
+  // ─── Delete event ─────────────────────────────────────────────────────────
+  function deleteEvent(state, eventId) {
+    const newState = Object.assign({}, state);
+    newState.events = state.events.filter(function (e) { return e.id !== eventId; });
+    if (newState.activeEventId === eventId) {
+      newState.activeEventId = null;
+    }
+    saveState(newState);
+    return newState;
+  }
+
   // ─── Reset (for testing / manual reset) ───────────────────────────────────
   function resetState() {
     try {
@@ -143,6 +154,7 @@ var Store = (function () {
     reorderItemsInEvent,
     addTransaction,
     closeEvent,
+    deleteEvent,
     resetState,
   };
 }());

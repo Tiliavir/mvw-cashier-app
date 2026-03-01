@@ -91,8 +91,21 @@ const SettingsApp = (function () {
       statsLink.href = Paths.page('stats', { id: event.id });
       statsLink.textContent = 'Statistik';
 
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'all-event-delete';
+      deleteBtn.textContent = 'Löschen';
+      deleteBtn.addEventListener('click', (function (ev) {
+        return function () {
+          if (!confirm('Veranstaltung "' + ev.name + '" wirklich löschen?')) return;
+          state = Store.deleteEvent(state, ev.id);
+          renderActiveEvent();
+          renderAllEvents();
+        };
+      }(event)));
+
       actionsDiv.appendChild(editLink);
       actionsDiv.appendChild(statsLink);
+      actionsDiv.appendChild(deleteBtn);
 
       row.appendChild(nameSpan);
       row.appendChild(revenueSpan);

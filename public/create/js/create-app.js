@@ -216,6 +216,10 @@ const CreateApp = (function () {
 
     // Example config
     on('btn-example-config', 'click', function () {
+      const nameInput = document.getElementById('event-name');
+      if (nameInput && !nameInput.value.trim()) {
+        nameInput.value = 'Vereinsfest';
+      }
       pendingItems = EXAMPLE_ITEMS.map(function (cfg) {
         return Models.createItem(cfg.name, cfg.price, cfg.color);
       });

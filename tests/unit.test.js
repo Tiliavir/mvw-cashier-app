@@ -317,6 +317,32 @@ test('closeEvent sets closed=true and clears activeEventId', function () {
   assertEqual(state.activeEventId, null);
 });
 
+test('deleteEvent removes event from list', function () {
+  let state = Storage.defaultState();
+  const event = Models.createEvent('ToDelete');
+  state = Storage.addEvent(state, event);
+  assertEqual(state.events.length, 1);
+  state = Storage.deleteEvent(state, event.id);
+  assertEqual(state.events.length, 0);
+});
+
+test('deleteEvent clears activeEventId when active event is deleted', function () {
+  let state = Storage.defaultState();
+  const event = Models.createEvent('Active');
+  state = Storage.addEvent(state, event);
+  assertEqual(state.activeEventId, event.id);
+  state = Storage.deleteEvent(state, event.id);
+  assertEqual(state.activeEventId, null);
+});
+
+test('deleteEvent is a no-op for nonexistent id', function () {
+  let state = Storage.defaultState();
+  const event = Models.createEvent('Keep');
+  state = Storage.addEvent(state, event);
+  state = Storage.deleteEvent(state, 'nonexistent-id');
+  assertEqual(state.events.length, 1);
+});
+
 test('setActiveEvent updates activeEventId', function () {
   let state = Storage.defaultState();
   const e1 = Models.createEvent('E1');
