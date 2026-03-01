@@ -20,7 +20,6 @@ const SettingsApp = (function () {
     const tipEl = document.getElementById('settings-tip');
     const txCountEl = document.getElementById('settings-tx-count');
     const closeBtn = document.getElementById('btn-close-event');
-    const editBtn = document.getElementById('btn-edit-event');
 
     if (active) {
       const totals = Models.calculateEventTotals(active);
@@ -29,14 +28,12 @@ const SettingsApp = (function () {
       if (tipEl) tipEl.textContent = UI.formatCurrency(totals.tip);
       if (txCountEl) txCountEl.textContent = String(totals.transactionCount);
       if (closeBtn) closeBtn.disabled = false;
-      if (editBtn) editBtn.disabled = false;
     } else {
       if (nameEl) nameEl.textContent = '—';
       if (revenueEl) revenueEl.textContent = UI.formatCurrency(0);
       if (tipEl) tipEl.textContent = UI.formatCurrency(0);
       if (txCountEl) txCountEl.textContent = '0';
       if (closeBtn) closeBtn.disabled = true;
-      if (editBtn) editBtn.disabled = true;
     }
   }
 
@@ -51,23 +48,38 @@ const SettingsApp = (function () {
       return;
     }
 
-    state.events.forEach(function (event) {
+    const sorted = state.events.slice().sort(function (a, b) {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
+    sorted.forEach(function (event) {
       const totals = Models.calculateEventTotals(event);
       const isActive = event.id === state.activeEventId;
       const row = document.createElement('div');
       row.className = 'all-event-row';
 
+      // Row 1: name (+ active badge) on left, revenue on right
       const nameSpan = document.createElement('span');
       nameSpan.className = 'all-event-name';
       nameSpan.textContent = event.name;
-
-      const dateSpan = document.createElement('span');
-      dateSpan.className = 'all-event-date';
-      dateSpan.textContent = UI.formatDate(event.createdAt);
+      if (isActive) {
+        const badge = document.createElement('span');
+        badge.className = 'event-badge-active';
+        badge.textContent = 'Aktiv';
+        nameSpan.appendChild(badge);
+      }
 
       const revenueSpan = document.createElement('span');
       revenueSpan.className = 'all-event-revenue';
       revenueSpan.textContent = UI.formatCurrency(totals.revenue);
+
+      // Row 2: date on left, action buttons on right
+      const dateSpan = document.createElement('span');
+      dateSpan.className = 'all-event-date';
+      dateSpan.textContent = UI.formatDate(event.createdAt);
+
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'all-event-actions';
 
       const editLink = document.createElement('a');
       editLink.className = 'all-event-link';
@@ -79,21 +91,14 @@ const SettingsApp = (function () {
       statsLink.href = 'stats.html?id=' + encodeURIComponent(event.id);
       statsLink.textContent = 'Statistik';
 
+      actionsDiv.appendChild(editLink);
+      actionsDiv.appendChild(statsLink);
+
       row.appendChild(nameSpan);
-      row.appendChild(dateSpan);
       row.appendChild(revenueSpan);
+      row.appendChild(dateSpan);
+      row.appendChild(actionsDiv);
 
-      if (isActive) {
-        const badge = document.createElement('span');
-        badge.className = 'event-badge-active';
-        badge.textContent = 'Aktiv';
-        row.appendChild(badge);
-      } else {
-        row.appendChild(document.createElement('span'));
-      }
-
-      row.appendChild(editLink);
-      row.appendChild(statsLink);
       container.appendChild(row);
     });
   }
@@ -114,13 +119,6 @@ const SettingsApp = (function () {
       state = Store.closeEvent(state, active.id);
       renderActiveEvent();
       renderAllEvents();
-    });
-
-    // Edit event items
-    on('btn-edit-event', 'click', function () {
-      const active = Store.getActiveEvent(state);
-      if (!active) return;
-      location.href = 'edit.html?id=' + encodeURIComponent(active.id);
     });
   }
 
