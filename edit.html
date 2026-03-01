@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Artikel bearbeiten – MVW Kassierer">
+  <title>Artikel bearbeiten – MVW Kassierer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="full-page">
+
+  <header class="app-header">
+    <button id="btn-back-settings" class="btn btn-back" aria-label="Zurück zu Einstellungen">
+      ← Zurück
+    </button>
+    <h1 id="edit-event-name">Artikel bearbeiten</h1>
+  </header>
+
+  <div id="edit-error" class="error-page" hidden>
+    <p>Veranstaltung nicht gefunden.</p>
+    <a href="settings.html" class="btn btn-secondary">← Zurück zu Einstellungen</a>
+  </div>
+
+  <main id="edit-content" class="setup-main" hidden>
+
+    <section class="setup-section">
+      <h2 class="section-title">Artikel hinzufügen</h2>
+
+      <div class="item-form">
+        <label for="item-name" class="field-label">Artikelname</label>
+        <input
+          id="item-name"
+          type="text"
+          class="text-input"
+          placeholder="Artikelname"
+          autocomplete="off"
+        >
+        <label for="item-price" class="field-label">Preis (€)</label>
+        <input
+          id="item-price"
+          type="number"
+          class="text-input"
+          placeholder="Preis (€)"
+          step="0.01"
+        >
+        <div class="color-row">
+          <label for="item-color" class="field-label">Farbe</label>
+          <input id="item-color" type="color" value="#cccccc" class="color-input">
+        </div>
+        <button id="btn-add-item" class="btn btn-secondary">+ Artikel</button>
+      </div>
+
+      <div id="setup-items-list" class="setup-items-list"></div>
+    </section>
+
+    <div class="export-row">
+      <button id="btn-export" class="btn btn-secondary">Einstellungen exportieren ↓</button>
+    </div>
+
+  </main>
+
+  <script src="models.js"></script>
+  <script src="storage.js"></script>
+  <script src="ui.js"></script>
+  <script src="edit-app.js"></script>
+</body>
+</html>

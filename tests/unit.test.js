@@ -181,6 +181,42 @@ test('generateId returns unique values', function () {
   assertEqual(ids.size, 100, 'All IDs should be unique');
 });
 
+test('calculateItemsSold returns correct quantities and revenue', function () {
+  const item1 = Models.createItem('Bier', '2.50', '#e67e22');
+  const item2 = Models.createItem('Wasser', '1.50', '#85c1e9');
+  const event = Models.createEvent('Test');
+  event.items = [item1, item2];
+  event.transactions = [
+    { items: [{ itemId: item1.id, quantity: 2 }, { itemId: item2.id, quantity: 1 }], total: 6.5, tip: 0 },
+    { items: [{ itemId: item1.id, quantity: 1 }], total: 2.5, tip: 0 },
+  ];
+  const sold = Models.calculateItemsSold(event);
+  assertEqual(sold[item1.id].name, 'Bier');
+  assertEqual(sold[item1.id].quantity, 3);
+  assertClose(sold[item1.id].revenue, 7.5);
+  assertEqual(sold[item2.id].name, 'Wasser');
+  assertEqual(sold[item2.id].quantity, 1);
+  assertClose(sold[item2.id].revenue, 1.5);
+});
+
+test('calculateItemsSold returns empty object for no transactions', function () {
+  const event = Models.createEvent('Test');
+  event.items = [Models.createItem('Bier', '2.50', '#000')];
+  event.transactions = [];
+  const sold = Models.calculateItemsSold(event);
+  assertEqual(Object.keys(sold).length, 0);
+});
+
+test('calculateItemsSold ignores unknown itemIds', function () {
+  const event = Models.createEvent('Test');
+  event.items = [];
+  event.transactions = [
+    { items: [{ itemId: 'nonexistent', quantity: 1 }], total: 0, tip: 0 },
+  ];
+  const sold = Models.calculateItemsSold(event);
+  assertEqual(Object.keys(sold).length, 0);
+});
+
 // ─── Storage tests ─────────────────────────────────────────────────────────────
 console.log('\nStorage:');
 

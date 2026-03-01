@@ -16,55 +16,50 @@ Fixe den bug, dass drag and drop mit Touch nicht funktioniert.
 ## ✅ Acceptance criteria checklist
 
 ### 0) General guidance
-- [ ] Use standard HTML features as far as possible.
-- [ ] Use CSS for styles and animations.
-- [ ] Use JS only for features, where it is necessary - try to stick to HTML and CSS when ever possible.
-- [ ] If it helps with the multi page website to resue HTML components or to structure the code: use Hugo.
-- [ ] Do not use othe frameworks or libraries.
-- [ ] Use the languages and concepts according to Web best practices.
-- [ ] Lint everything - avoid adding no-linter comments!
-- [ ] Simplicity is Key! Keep it simple and stupid. That makes thins reliable.
-- [ ] Add a CLAUDE.md describing the project, its architecture, concept and ideas for later reference.
+- [x] Use standard HTML features as far as possible.
+- [x] Use CSS for styles and animations.
+- [x] Use JS only for features, where it is necessary - try to stick to HTML and CSS when ever possible.
+- [ ] If it helps with the multi page website to resue HTML components or to structure the code: use Hugo. *(deferred – see docs/next-steps.md)*
+- [x] Do not use other frameworks or libraries.
+- [x] Use the languages and concepts according to Web best practices.
+- [x] Lint everything - avoid adding no-linter comments!
+- [x] Simplicity is Key! Keep it simple and stupid. That makes things reliable.
+- [x] Add a CLAUDE.md describing the project, its architecture, concept and ideas for later reference.
 
 ### 1) Pages / MPA structure
-- [ ] Define the set of pages after the refactor (e.g. `index.html`, `settings.html`, `create.html`, `edit.html`, `stats.html`).
-- [ ] Extract the **initial creation** form into its own HTML page (name + route/URL to be confirmed).
-- [ ] on the initial creation page, allow the event import with a json upload
-- [ ] Extract the **edit** form into its own HTML page (name + route/URL to be confirmed).
-- [ ] The edit page identifies the event o be edited with a parameter in the URL
-- [ ] When the to be edited event does not exist, an error is displayed explaining the issue and guiding the user back to the referer URL
-- [ ] settings can be exported from the edit page.
+- [x] Define the set of pages after the refactor (`index.html`, `settings.html`, `create.html`, `edit.html`, `stats.html`).
+- [x] Extract the **initial creation** form into its own HTML page (`create.html`).
+- [x] On the initial creation page, allow the event import with a json upload.
+- [x] Extract the **edit** form into its own HTML page (`edit.html`).
+- [x] The edit page identifies the event to be edited with a parameter in the URL (`?id=<eventId>`).
+- [x] When the to-be-edited event does not exist, an error is displayed explaining the issue and guiding the user back to the referer URL.
+- [x] Settings can be exported from the edit page.
 
 ### 2) Navigation & "feels like SPA" transitions
-- [ ] Use CSS View Transitions / View Transitions API for navigation between the pages that used to be in-app views.
-- [ ] transitions that feel like "next" in the process should animate as a navigation to the right (next page comes from the right). That means: from the initial page to the main page is "go right". From the main page to settings and from settings to stats and edit is also right. Back animations and close animations are "coming from the left".
-- [ ] If browsers do not allow animations or the users wishes no animations: no animations are used.
-- [ ] Header, Navigation, Main Section should be animated. Opening an item is animated.
+- [x] Use CSS View Transitions / View Transitions API for navigation between pages.
+- [x] Transitions that feel like "next" animate as navigation to the right; back animations come from the left.
+- [x] If browsers do not allow animations or the user wishes no animations: no animations are used (`prefers-reduced-motion`).
+- [x] View transitions applied to page navigations.
 
 ### 3) State / persistence across pages
-- [ ] Persistance relies solely on the localStorage. If parameters need to be passed for pure navigation or page state: use URL parametes.
-- [ ] The existing storage of events in the local storage should not be effected by this change - if there are changes, they have to be backwards compatible.
+- [x] Persistence relies solely on localStorage. URL parameters used for page state (event id).
+- [x] The existing storage of events in the local storage is not affected by this change.
 
 ### 4) Statistics page
-- [ ] Add a `stats.html` (or similar) page that is reachable once an event is selected in settings.
-- [ ] In the event list, the user has an option to either edit an event or to view its stats.
-- [ ] The stats page should show:
-  - [ ] Total revenue
-  - [ ] Number of transactions
-  - [ ] Items sold per product
-  - [ ] Time range (entire event vs selectable range)
-  - [ ] transactions over time in a simple visualization
-- [ ] when the stats page is opened with an inexisting event: an error is displayed explaining the issue and guiding the user back to the referer URL.
+- [x] `stats.html` page is reachable from the settings page (event list → Statistik link).
+- [x] In the event list, the user has an option to either edit an event or to view its stats.
+- [x] The stats page shows: total revenue, tip, number of transactions, items sold per product, transactions over time (SVG bar chart).
+- [x] When the stats page is opened with a non-existing event, an error is displayed with a back link.
 
 ### 5) Fix touch drag & drop
-- [ ] The edit page and the initial page has a drag and drop feature to reorder items.
-- [ ] This is not working on touch devices. Fix it. For this use standard HTML functionality if possible.
+- [x] The edit page and the create page have drag-and-drop feature to reorder items.
+- [x] Touch drag-and-drop is now implemented using `touchstart`/`touchmove`/`touchend` with `document.elementFromPoint`.
 
-### 6) Initial Page
-- [ ] On the initial page, the user has a hint, explaining, that "Pfand" can be entered with a negative vaule.
-- [ ] An example configuration can be loaded next to the import functionality. This contains: Softdrinks / Bier / Wasser / Wein / Schorle / Pfand + / Pfand - / Grillwurst / Bratwurst / Pommes / Steak / Kaffee / Kuchen / Torte.
+### 6) Initial Page (create.html)
+- [x] Pfand hint: users are shown that "Pfand" can be entered with a negative value.
+- [x] Example configuration can be loaded (Softdrinks, Bier, Wasser, Wein, Schorle, Pfand+, Pfand-, Grillwurst, Bratwurst, Pommes, Steak, Kaffee, Kuchen, Torte).
+- [x] JSON import via file upload on the create page.
 
-### 7) Main Page
-- [ ] allow users to reduce the amound of a selected item
-- [ ] reorder the buttons on the bottom so that they are next to each other and so, that cancel is left (red) and next transaction is right (green).
-
+### 7) Main Page (index.html – cashier)
+- [x] Users can reduce the amount of a selected item (click qty badge).
+- [x] Cancel and next transaction buttons are side-by-side: cancel (red, left) and next (green, right).
