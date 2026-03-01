@@ -415,10 +415,6 @@ html, body {
   color: #e74c3c;
 }
 
-.tx-tip {
-  color: #27ae60;
-}
-
 .tx-input {
   flex: 1;
   text-align: right;

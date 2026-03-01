@@ -104,20 +104,6 @@ test('calculateChange returns 0 for negative received', function () {
   assertEqual(Models.calculateChange(5.0, -1), 0);
 });
 
-test('calculateTip returns correct tip', function () {
-  // total=8, received=10, change=2 → tip=0
-  assertClose(Models.calculateTip(8.0, 10.0, 2.0), 0);
-});
-
-test('calculateTip returns tip when no change given back', function () {
-  // total=8, received=10, change=0 → tip=2
-  assertClose(Models.calculateTip(8.0, 10.0, 0), 2.0);
-});
-
-test('calculateTip returns 0 for negative received', function () {
-  assertEqual(Models.calculateTip(5.0, -1, 0), 0);
-});
-
 test('createEvent sets correct fields', function () {
   const e = Models.createEvent('Test Event');
   assertEqual(e.name, 'Test Event');
@@ -151,13 +137,12 @@ test('buildItemsMap creates lookup by id', function () {
 test('calculateEventTotals sums transactions correctly', function () {
   const event = {
     transactions: [
-      { total: 5.0, tip: 1.0 },
-      { total: 3.0, tip: 0.5 },
+      { total: 5.0 },
+      { total: 3.0 },
     ],
   };
   const result = Models.calculateEventTotals(event);
   assertClose(result.revenue, 8.0);
-  assertClose(result.tip, 1.5);
   assertEqual(result.transactionCount, 2);
 });
 
@@ -165,7 +150,6 @@ test('calculateEventTotals returns zeros for no transactions', function () {
   const event = { transactions: [] };
   const result = Models.calculateEventTotals(event);
   assertEqual(result.revenue, 0);
-  assertEqual(result.tip, 0);
   assertEqual(result.transactionCount, 0);
 });
 
@@ -187,8 +171,8 @@ test('calculateItemsSold returns correct quantities and revenue', function () {
   const event = Models.createEvent('Test');
   event.items = [item1, item2];
   event.transactions = [
-    { items: [{ itemId: item1.id, quantity: 2 }, { itemId: item2.id, quantity: 1 }], total: 6.5, tip: 0 },
-    { items: [{ itemId: item1.id, quantity: 1 }], total: 2.5, tip: 0 },
+    { items: [{ itemId: item1.id, quantity: 2 }, { itemId: item2.id, quantity: 1 }], total: 6.5 },
+    { items: [{ itemId: item1.id, quantity: 1 }], total: 2.5 },
   ];
   const sold = Models.calculateItemsSold(event);
   assertEqual(sold[item1.id].name, 'Bier');
@@ -211,7 +195,7 @@ test('calculateItemsSold ignores unknown itemIds', function () {
   const event = Models.createEvent('Test');
   event.items = [];
   event.transactions = [
-    { items: [{ itemId: 'nonexistent', quantity: 1 }], total: 0, tip: 0 },
+    { items: [{ itemId: 'nonexistent', quantity: 1 }], total: 0 },
   ];
   const sold = Models.calculateItemsSold(event);
   assertEqual(Object.keys(sold).length, 0);
@@ -222,7 +206,7 @@ test('calculateItemsSold handles mix of known and unknown itemIds', function () 
   const event = Models.createEvent('Test');
   event.items = [item];
   event.transactions = [
-    { items: [{ itemId: item.id, quantity: 1 }, { itemId: 'ghost', quantity: 5 }], total: 2.5, tip: 0 },
+    { items: [{ itemId: item.id, quantity: 1 }, { itemId: 'ghost', quantity: 5 }], total: 2.5 },
   ];
   const sold = Models.calculateItemsSold(event);
   assertEqual(Object.keys(sold).length, 1, 'only the known item is counted');
@@ -301,7 +285,7 @@ test('addTransaction records transaction', function () {
   let state = Storage.defaultState();
   const event = Models.createEvent('Test');
   state = Storage.addEvent(state, event);
-  const tx = Models.createTransaction([], 5.0, 10.0, 5.0, 0);
+  const tx = Models.createTransaction([], 5.0, 10.0, 5.0);
   state = Storage.addTransaction(state, event.id, tx);
   const active = Storage.getActiveEvent(state);
   assertEqual(active.transactions.length, 1);
@@ -473,26 +457,6 @@ test('updateItem in pendingItems updates name, price and color', function () {
   assertEqual(pendingItems[0].color, '#ff0000');
   assertEqual(pendingItems[0].id, id, 'id must not change');
 });
-
-// ─── Manual tip override logic (mirrors app.js next-tx handler) ───────────────
-console.log('\nManual tip override:');
-
-test('manual tip calculates change as received - total - tip', function () {
-  const total = 7.5;
-  const received = 10.0;
-  const manualTip = 0.5;
-  const change = Math.max(0, Math.round((received - total - manualTip) * 100) / 100);
-  assertClose(change, 2.0);
-});
-
-test('manual tip clamps change to 0 if tip exceeds available amount', function () {
-  const total = 7.5;
-  const received = 8.0;
-  const manualTip = 5.0; // more than the 0.5 surplus
-  const change = Math.max(0, Math.round((received - total - manualTip) * 100) / 100);
-  assertEqual(change, 0);
-});
-
 
 // ─── Summary ─────────────────────────────────────────────────────────────────
 console.log('\n─────────────────────────────');

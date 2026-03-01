@@ -39,7 +39,6 @@ const StatsApp = (function () {
 
     const cards = [
       { label: 'Umsatz', value: UI.formatCurrency(totals.revenue) },
-      { label: 'Trinkgeld', value: UI.formatCurrency(totals.tip) },
       { label: 'Transaktionen', value: String(totals.transactionCount) },
     ];
 

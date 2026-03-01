@@ -117,7 +117,7 @@ var UI = (function () {
   }
 
   // ─── Transaction bar ─────────────────────────────────────────────────────
-  function renderTransactionBar(total, received, change, tip) {
+  function renderTransactionBar(total, received, change) {
     const totalEl = document.getElementById('tx-total');
     if (totalEl) totalEl.textContent = formatCurrency(total);
 
@@ -126,9 +126,6 @@ var UI = (function () {
       changeEl.textContent = formatCurrency(change);
       changeEl.classList.toggle('tx-change-negative', change < 0);
     }
-
-    const tipEl = document.getElementById('tx-tip');
-    if (tipEl) tipEl.value = tip > 0 ? tip.toFixed(2) : '';
   }
 
   // ─── Settings Screen ─────────────────────────────────────────────────────
@@ -139,7 +136,6 @@ var UI = (function () {
 
     const nameEl = document.getElementById('settings-event-name');
     const revenueEl = document.getElementById('settings-revenue');
-    const tipEl = document.getElementById('settings-tip');
     const txCountEl = document.getElementById('settings-tx-count');
     const closeBtn = document.getElementById('btn-close-event');
 
@@ -147,13 +143,11 @@ var UI = (function () {
       const totals = calculateEventTotals(activeEvent);
       if (nameEl) nameEl.textContent = activeEvent.name;
       if (revenueEl) revenueEl.textContent = formatCurrency(totals.revenue);
-      if (tipEl) tipEl.textContent = formatCurrency(totals.tip);
       if (txCountEl) txCountEl.textContent = totals.transactionCount;
       if (closeBtn) closeBtn.disabled = false;
     } else {
       if (nameEl) nameEl.textContent = '—';
       if (revenueEl) revenueEl.textContent = formatCurrency(0);
-      if (tipEl) tipEl.textContent = formatCurrency(0);
       if (txCountEl) txCountEl.textContent = '0';
       if (closeBtn) closeBtn.disabled = true;
     }
