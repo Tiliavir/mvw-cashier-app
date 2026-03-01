@@ -134,7 +134,7 @@ const StatsApp = (function () {
     const NS = 'http://www.w3.org/2000/svg';
     const width = 600;
     const height = 220;
-    const padding = { top: 16, right: 12, bottom: 36, left: 36 };
+    const padding = { top: 16, right: 12, bottom: 36, left: 52 };
     const innerW = width - padding.left - padding.right;
     const innerH = height - padding.top - padding.bottom;
     const maxVal = Math.max(1, data.reduce(function (m, d) { return d.value > m ? d.value : m; }, 0));
@@ -163,6 +163,32 @@ const StatsApp = (function () {
     axisY.setAttribute('stroke', '#bbb');
     axisY.setAttribute('stroke-width', '1');
     svg.appendChild(axisY);
+
+    // Y-axis tick labels (4 intervals → 5 ticks: 0%, 25%, 50%, 75%, 100% of maxVal)
+    const yTickIntervals = 4;
+    for (let t = 0; t <= yTickIntervals; t++) {
+      const tickVal = Math.round((maxVal * t / yTickIntervals) * 100) / 100;
+      const tickY = padding.top + innerH - (t / yTickIntervals) * innerH;
+      const tickLabel = document.createElementNS(NS, 'text');
+      tickLabel.setAttribute('x', String(padding.left - 6));
+      tickLabel.setAttribute('y', String(tickY + 4));
+      tickLabel.setAttribute('text-anchor', 'end');
+      tickLabel.setAttribute('font-size', '9');
+      tickLabel.setAttribute('fill', '#888');
+      tickLabel.textContent = String(tickVal);
+      svg.appendChild(tickLabel);
+
+      if (t > 0) {
+        const gridLine = document.createElementNS(NS, 'line');
+        gridLine.setAttribute('x1', String(padding.left));
+        gridLine.setAttribute('y1', String(tickY));
+        gridLine.setAttribute('x2', String(padding.left + innerW));
+        gridLine.setAttribute('y2', String(tickY));
+        gridLine.setAttribute('stroke', '#eee');
+        gridLine.setAttribute('stroke-width', '1');
+        svg.appendChild(gridLine);
+      }
+    }
 
     let points = '';
     data.forEach(function (d, i) {

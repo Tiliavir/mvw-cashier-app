@@ -32,7 +32,9 @@ const App = (function () {
     const safeReceived = received < 0 ? 0 : received;
     const change = Models.calculateChange(total, safeReceived);
     const tip = Models.calculateTip(total, safeReceived, change);
-    UI.renderTransactionBar(total, safeReceived, change, tip);
+    // Show negative change when underpaid; keep 0 when no amount entered yet
+    const displayChange = safeReceived > 0 ? Math.round((safeReceived - total) * 100) / 100 : 0;
+    UI.renderTransactionBar(total, safeReceived, displayChange, tip);
   }
 
   // ─── Bind events ─────────────────────────────────────────────────────────
@@ -93,7 +95,10 @@ const App = (function () {
       const safeTip = manualTip < 0 ? 0 : manualTip;
       const change = Math.max(0, Math.round((safeReceived - total - safeTip) * 100) / 100);
       const changeEl = document.getElementById('tx-change');
-      if (changeEl) changeEl.textContent = UI.formatCurrency(change);
+      if (changeEl) {
+        changeEl.textContent = UI.formatCurrency(change);
+        changeEl.classList.remove('tx-change-negative');
+      }
     });
 
     // Next transaction

@@ -122,7 +122,10 @@ var UI = (function () {
     if (totalEl) totalEl.textContent = formatCurrency(total);
 
     const changeEl = document.getElementById('tx-change');
-    if (changeEl) changeEl.textContent = formatCurrency(change);
+    if (changeEl) {
+      changeEl.textContent = formatCurrency(change);
+      changeEl.classList.toggle('tx-change-negative', change < 0);
+    }
 
     const tipEl = document.getElementById('tx-tip');
     if (tipEl) tipEl.value = tip > 0 ? tip.toFixed(2) : '';
