@@ -1,7 +1,8 @@
 {
-  "extends": "stylelint-config-standard",
+  "extends": "stylelint-config-standard-scss",
   "rules": {
-    "at-rule-no-unknown": [true, { "ignoreAtRules": ["view-transition"] }],
+    "at-rule-no-unknown": null,
+    "scss/at-rule-no-unknown": [true, { "ignoreAtRules": ["view-transition"] }],
     "no-descending-specificity": null,
     "selector-pseudo-element-no-unknown": [true, { "ignorePseudoElements": ["view-transition-image-pair", "view-transition-new", "view-transition-old"] }]
   }

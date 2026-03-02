@@ -9,17 +9,27 @@
     "url": "https://github.com/Tiliavir/mvw-cashier-app.git"
   },
   "scripts": {
-    "lint": "stylelint public/css/style.css && eslint .",
+    "build:css": "sass src/scss/style.scss | postcss --no-map --output public/css/style.css",
+    "build:js": "node scripts/build-js.js",
+    "compile": "npm run build:css && npm run build:js",
+    "lint": "stylelint src/scss/style.scss && eslint .",
     "validate": "npx vnu --skip-non-html public/index.html public/create/index.html public/edit/index.html public/settings/index.html public/stats/index.html",
     "test": "node tests/unit.test.js",
-    "build": "npm run lint && npm run validate && npm run test"
+    "build": "npm run compile && npm run lint && npm run validate && npm run test"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "autoprefixer": "^10.4.27",
+    "cssnano": "^7.1.2",
     "eslint": "10.0.2",
     "globals": "17.3.0",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.1",
+    "sass": "^1.97.3",
     "stylelint": "17.4.0",
     "stylelint-config-standard": "40.0.0",
+    "stylelint-config-standard-scss": "^17.0.0",
+    "terser": "^5.46.0",
     "vnu-jar": "26.2.26"
   }
 }
