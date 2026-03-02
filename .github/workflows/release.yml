@@ -49,11 +49,8 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
 
-      - name: Build assets
-        run: npm run build:assets
-
       - name: Build Hugo site
-        run: hugo --cleanDestinationDir --baseURL "${{ steps.pages.outputs.base_url }}/"
+        run: hugo --cleanDestinationDir --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4

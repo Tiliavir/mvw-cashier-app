@@ -1,6 +1,6 @@
 {
   "name": "mvw-cashier-app",
-  "version": "0.8.0",
+  "version": "0.9.1",
   "description": "Browser-based cashier app for club events",
   "license": "MIT",
   "author": "Markus Lindenmann",
@@ -9,11 +9,10 @@
     "url": "https://github.com/Tiliavir/mvw-cashier-app.git"
   },
   "scripts": {
-    "build:hugo": "hugo --cleanDestinationDir --minify",
-    "compile": "npm run build:hugo",
+    "compile": "hugo --cleanDestinationDir --minify",
     "lint": "stylelint assets/scss/style.scss && eslint .",
     "validate": "npx vnu --skip-non-html --filterpattern '.*view-transition.*|.*CSS: Parse Error.*' public/**/*.html",
-    "test": "npm run build:hugo && node scripts/run-playwright.js",
+    "test": "npm run compile && node scripts/run-playwright.js",
     "build": "npm run compile && npm run lint && npm run validate && npm run test",
     "dev": "hugo serve --baseURL http://localhost:1313/"
   },
