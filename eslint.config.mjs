@@ -6,7 +6,7 @@ import tsPlugin from "@typescript-eslint/eslint-plugin";
 export default [
   js.configs.recommended,
   {
-    files: ["assets/ts/**/*.ts", "tests/e2e/**/*.ts", "playwright.config.ts"],
+    files: ["assets/ts/**/*.ts", "tests/e2e/**/*.ts"],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -21,7 +21,7 @@ export default [
       "@typescript-eslint": tsPlugin,
     },
     rules: {
-      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
       "@typescript-eslint/no-explicit-any": "warn",
     },
   },

@@ -28,7 +28,7 @@ function getBaseUrl(): string {
         // Mismatch: static files built with different baseURL, use root
         href = '/';
       }
-    } catch (_e) {
+    } catch {
       href = '/';
     }
   }

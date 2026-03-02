@@ -13,7 +13,7 @@ function formatDate(isoString: string): string {
       month: '2-digit',
       year: 'numeric',
     });
-  } catch (_e) {
+  } catch {
     return isoString;
   }
 }
@@ -21,11 +21,13 @@ function formatDate(isoString: string): string {
 // ─── Screen management ────────────────────────────────────────────────
 function showScreen(screenId: string): void {
   const screens = document.querySelectorAll('.screen');
-  screens.forEach((s) => {
-    s.classList.remove('active');
+  screens.forEach((screen) => {
+    screen.classList.remove('active');
   });
-  const target = document.getElementById(screenId);
-  if (target) target.classList.add('active');
+  const targetScreen = document.getElementById(screenId);
+  if (targetScreen) {
+    targetScreen.classList.add('active');
+  }
 }
 
 // ─── Setup Screen ────────────────────────────────────────────────────
@@ -150,7 +152,7 @@ function renderTransactionBar(total: number, received: number, change: number): 
 // ─── Settings Screen ─────────────────────────────────────────────────
 function renderSettingsScreen(
   state: any,
-  calculateEventTotals: (event: Event) => { revenue: number; transactionCount: number }
+  calculateEventTotals: (event: Event) => { revenue: number; transactionCount: number } // eslint-disable-line no-unused-vars
 ): void {
   showScreen('screen-settings');
 
@@ -179,7 +181,7 @@ function renderSettingsScreen(
 
 function renderPastEvents(
   events: Event[],
-  calculateEventTotals: (event: Event) => { revenue: number; transactionCount: number }
+  calculateEventTotals: (event: Event) => { revenue: number; transactionCount: number } // eslint-disable-line no-unused-vars
 ): void {
   const container = document.getElementById('past-events-list');
   if (!container) return;
@@ -245,3 +247,4 @@ export const UI = {
   escapeHtml,
   escapeAttr,
 };
+

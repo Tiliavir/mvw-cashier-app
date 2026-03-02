@@ -172,7 +172,7 @@ const CreateApp = (() => {
             editingItemId = null;
             renderItems();
             if (errorEl) errorEl.textContent = '';
-          } catch (_e) {
+          } catch {
             if (errorEl) errorEl.textContent = 'Fehler beim Importieren: Ungültiges JSON-Format.';
           }
           fileInput.value = '';

@@ -25,7 +25,7 @@ function loadState(): AppState {
     // Basic integrity check
     if (!parsed || !Array.isArray(parsed.events)) return defaultState();
     return parsed;
-  } catch (_e) {
+  } catch {
     return defaultState();
   }
 }
@@ -134,7 +134,7 @@ function deleteEvent(state: AppState, eventId: string): AppState {
 function resetState(): AppState {
   try {
     localStorage.removeItem(STORAGE_KEY);
-  } catch (_e) {
+  } catch {
     /* ignore */
   }
   return defaultState();
