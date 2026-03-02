@@ -44,16 +44,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Setup GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
       - name: Build assets
         run: npm run build:assets
 
       - name: Build Hugo site
-        run: |
-          REPO_NAME="${GITHUB_REPOSITORY#*/}"
-          hugo --cleanDestinationDir --baseURL "/${REPO_NAME}/"
-
-      - name: Setup GitHub Pages
-        uses: actions/configure-pages@v5
+        run: hugo --cleanDestinationDir --baseURL "${{ steps.pages.outputs.base_url }}/"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
