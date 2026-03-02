@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  {{ partial "head.html" . }}
+</head>
+<body class="full-page">
+  {{ block "content" . }}{{ end }}
+
+  {{- with resources.Get "ts/shared/index.ts" | js.Build | minify }}
+  <script>{{ .Content | safeJS }}</script>
+  {{- end }}
+
+  {{ range .Page.Params.CustomExternalJs -}}
+    <script defer src="{{ . }}"></script>
+  {{- end }}
+
+  {{ with .Page.Params.tsEntry }}
+    {{ with resources.Get . | js.Build | minify }}
+    <script>{{ .Content | safeJS }}</script>
+    {{ end }}
+  {{ end }}
+</body>
+</html>

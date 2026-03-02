@@ -1,37 +1,35 @@
 {
   "name": "mvw-cashier-app",
-  "version": "1.0.0",
+  "version": "0.8.0",
   "description": "Browser-based cashier app for club events",
-  "license": "Unlicense",
-  "author": "Tiliavir",
+  "license": "MIT",
+  "author": "Markus Lindenmann",
   "repository": {
     "type": "git",
     "url": "https://github.com/Tiliavir/mvw-cashier-app.git"
   },
   "scripts": {
-    "build:css": "sass src/scss/style.scss | postcss --no-map --output static/css/style.css",
-    "build:js": "node scripts/build-js.js",
-    "build:assets": "npm run build:css && npm run build:js",
     "build:hugo": "hugo --cleanDestinationDir",
-    "compile": "npm run build:assets && npm run build:hugo",
-    "lint": "stylelint src/scss/style.scss && eslint .",
+    "compile": "npm run build:hugo",
+    "lint": "stylelint assets/scss/style.scss && eslint .",
     "validate": "npx vnu --skip-non-html public/index.html public/create/index.html public/edit/index.html public/settings/index.html public/stats/index.html public/impressum/index.html public/haftungsausschluss/index.html",
-    "test": "node tests/unit.test.js",
-    "build": "npm run compile && npm run lint && npm run validate && npm run test"
+    "test": "npm run build:hugo && node scripts/run-playwright.js",
+    "build": "npm run compile && npm run lint && npm run validate && npm run test",
+    "dev": "hugo serve --baseURL http://localhost:1313/"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "autoprefixer": "^10.4.27",
-    "cssnano": "^7.1.2",
+    "@playwright/test": "^1.49.1",
+    "@typescript-eslint/eslint-plugin": "^8.5.0",
+    "@typescript-eslint/parser": "^8.5.0",
+    "@types/node": "^22.10.2",
     "eslint": "10.0.2",
     "globals": "17.3.0",
-    "postcss": "^8.5.6",
-    "postcss-cli": "^11.0.1",
     "sass": "^1.97.3",
     "stylelint": "17.4.0",
     "stylelint-config-standard": "40.0.0",
     "stylelint-config-standard-scss": "^17.0.0",
-    "terser": "^5.46.0",
+    "typescript": "^5.7.2",
     "vnu-jar": "26.2.26"
   }
 }

@@ -1,11 +1,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="{{ .Params.description | default (.Site.Params.description) }}">
+<meta name="author" content="{{- .Site.Params.author | default "Markus Lindenmann" -}}"/>
+<meta name="description" content="{{ .Description }}"/>
+<meta name="keywords" content="{{ delimit .Keywords ", " }}"/>
 <meta name="theme-color" content="#1a1a2e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta property="og:title" content="{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} - {{ .Site.Title }}{{ end }}">
-<meta property="og:description" content="{{ .Params.description | default (.Site.Params.description) }}">
+<meta property="og:description" content="{{ .Description }}">
 <meta property="og:type" content="website">
 <base href="{{ .Site.BaseURL }}">
 <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} - {{ .Site.Title }}{{ end }}</title>
@@ -21,4 +23,7 @@
   }());
 </script>
 {{- end }}
-<link rel="stylesheet" href="css/style.css">
+{{- $cssOpts := dict "targetPath" "css/app.css" "outputStyle" "compressed" "enableSourceMap" false -}}
+{{- with resources.Get "scss/style.scss" | toCSS $cssOpts | minify -}}
+  <style>{{ .Content | safeCSS }}</style>
+{{- end }}

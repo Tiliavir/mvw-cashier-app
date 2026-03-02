@@ -1,0 +1,942 @@
+// ─── Variables ────────────────────────────────────────────────────────────────
+$color-bg: #f5f5f5;
+$color-text: #222;
+$color-header-bg: #1a1a2e;
+$color-primary: #2ecc71;
+$color-secondary: #3498db;
+$color-danger: #e74c3c;
+$color-white: #fff;
+$color-border: #ddd;
+$color-subtle: #f9f9f9;
+$color-muted: #666;
+$color-green: #27ae60;
+$radius-sm: 6px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.08);
+$shadow-md: 0 2px 6px rgba(0, 0, 0, 0.15);
+$shadow-header: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+// ─── Reset & base ─────────────────────────────────────────────────────────────
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  background: $color-bg;
+  color: $color-text;
+  overflow-x: hidden;
+}
+
+// ─── Screen management ────────────────────────────────────────────────────────
+.screen {
+  display: none;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+
+  &.active {
+    display: flex;
+  }
+}
+
+// ─── App header ───────────────────────────────────────────────────────────────
+.app-header {
+  background: $color-header-bg;
+  color: $color-white;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  box-shadow: $shadow-header;
+
+  h1 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    flex: 1;
+  }
+}
+
+.cashier-header .event-title {
+  font-size: 1.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ─── Buttons ──────────────────────────────────────────────────────────────────
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: $radius-md;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+
+  &:active {
+    transform: scale(0.97);
+    opacity: 0.85;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.btn-primary {
+  background: $color-primary;
+  color: $color-white;
+}
+
+.btn-secondary {
+  background: $color-secondary;
+  color: $color-white;
+}
+
+.btn-danger {
+  background: $color-danger;
+  color: $color-white;
+}
+
+.btn-back {
+  background: transparent;
+  color: $color-white;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.95rem;
+}
+
+.btn-icon-only {
+  background: transparent;
+  color: $color-white;
+  padding: 0.5rem;
+  font-size: 1.4rem;
+  line-height: 1;
+  border-radius: 50%;
+}
+
+.btn-full {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+}
+
+// ─── Form elements ────────────────────────────────────────────────────────────
+.text-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid $color-border;
+  border-radius: $radius-md;
+  font-size: 1rem;
+  background: $color-white;
+  transition: border-color 0.2s;
+  appearance: none;
+
+  &:focus {
+    outline: none;
+    border-color: $color-secondary;
+  }
+}
+
+.field-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #444;
+  font-size: 0.9rem;
+}
+
+// ─── Setup screen ─────────────────────────────────────────────────────────────
+.setup-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.setup-section {
+  background: $color-white;
+  border-radius: $radius-lg;
+  padding: 1rem;
+  box-shadow: $shadow-sm;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #333;
+}
+
+.item-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.color-input {
+  width: 48px;
+  height: 40px;
+  border: 2px solid $color-border;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  padding: 2px;
+  background: $color-white;
+}
+
+// Setup item list
+.setup-items-list {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.setup-item-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: $color-subtle;
+  border-radius: $radius-sm;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid transparent;
+  cursor: pointer;
+
+  &.setup-item-edit {
+    flex-wrap: wrap;
+    cursor: default;
+    background: $color-white;
+    border-color: $color-secondary;
+    padding: 0.6rem 0.75rem;
+  }
+
+  &.dragging {
+    opacity: 0.4;
+  }
+
+  &.drag-over {
+    border-color: $color-secondary;
+    background: #ebf5fb;
+  }
+}
+
+.setup-item-edit {
+  .edit-name {
+    flex: 1;
+    min-width: 6rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .edit-price {
+    width: 6rem;
+    flex-shrink: 0;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .edit-color {
+    width: 36px;
+    height: 34px;
+    flex-shrink: 0;
+  }
+}
+
+.btn-save-item {
+  background: none;
+  border: none;
+  color: #27ae60;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.drag-handle {
+  cursor: grab;
+  color: #bbb;
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  user-select: none;
+  touch-action: none;
+}
+
+.setup-item-color {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.setup-item-name {
+  flex: 1;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.setup-item-price {
+  font-size: 0.85rem;
+  color: $color-muted;
+  font-style: italic;
+}
+
+.btn-remove-item {
+  background: none;
+  border: none;
+  color: $color-danger;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.empty-hint {
+  color: #999;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+// ─── Cashier screen ───────────────────────────────────────────────────────────
+.cashier-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem;
+
+  // Reserve space for the fixed-ish footer
+  padding-bottom: 0.5rem;
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.item-tile {
+  position: relative;
+  border: none;
+  border-radius: $radius-lg;
+  padding: 1rem 0.75rem;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: $shadow-md;
+  transition: transform 0.1s, box-shadow 0.1s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+
+  &:active {
+    transform: scale(0.95);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.tile-name {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #111;
+  line-height: 1.2;
+}
+
+.tile-price {
+  font-style: italic;
+  font-size: 0.8rem;
+  color: #555;
+  margin-top: 0.2rem;
+}
+
+.tile-qty {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.65);
+  color: $color-white;
+  font-size: 1.1rem;
+  font-weight: 800;
+  border-radius: 50%;
+  min-width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+// ─── Transaction bar ──────────────────────────────────────────────────────────
+.tx-bar {
+  background: $color-white;
+  border-top: 2px solid #e0e0e0;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.tx-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.tx-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #444;
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+.tx-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: $color-text;
+}
+
+.tx-total {
+  font-size: 1.2rem;
+  color: $color-header-bg;
+}
+
+.tx-change-negative {
+  color: $color-danger;
+}
+
+.tx-input {
+  flex: 1;
+  text-align: right;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid $color-border;
+  border-radius: $radius-sm;
+  font-size: 1.05rem;
+  font-weight: 600;
+  max-width: 160px;
+  background: $color-white;
+  appearance: none;
+
+  &:focus {
+    outline: none;
+    border-color: $color-secondary;
+  }
+}
+
+// ─── Settings screen ──────────────────────────────────────────────────────────
+.settings-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.settings-section {
+  background: $color-white;
+  border-radius: $radius-lg;
+  padding: 1rem;
+  box-shadow: $shadow-sm;
+}
+
+.settings-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 1rem;
+  align-items: baseline;
+}
+
+.info-label {
+  font-size: 0.9rem;
+  color: $color-muted;
+}
+
+.info-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: $color-text;
+}
+
+// ─── Past events list ─────────────────────────────────────────────────────────
+.past-events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.past-event-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 0.5rem;
+  align-items: center;
+  background: $color-subtle;
+  border-radius: $radius-sm;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+.past-event-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.past-event-date {
+  color: #888;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.past-event-revenue {
+  font-weight: 700;
+  color: $color-green;
+  white-space: nowrap;
+}
+
+.past-event-tx {
+  color: #888;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+// ─── Responsive tweaks ────────────────────────────────────────────────────────
+@media (min-width: 480px) {
+  .item-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .app-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .item-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+
+  .item-tile {
+    min-height: 100px;
+    padding: 1.2rem 1rem;
+  }
+
+  .tx-bar {
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+    border-radius: $radius-lg $radius-lg 0 0;
+  }
+}
+
+// ─── View Transitions ─────────────────────────────────────────────────────────
+@view-transition {
+  navigation: auto;
+}
+
+@keyframes slide-from-left {
+  from { translate: -100vw 0; }
+}
+
+@keyframes slide-from-right {
+  from { translate: 100vw 0; }
+}
+
+@keyframes slide-to-left {
+  to { translate: -100vw 0; }
+}
+
+@keyframes slide-to-right {
+  to { translate: 100vw 0; }
+}
+
+::view-transition-new(root) {
+  animation: 250ms ease-out slide-from-right;
+}
+
+::view-transition-old(root) {
+  animation: 250ms ease-in slide-to-left;
+}
+
+html[data-direction="back"] {
+  ::view-transition-new(root) {
+    animation-name: slide-from-left;
+  }
+
+  ::view-transition-old(root) {
+    animation-name: slide-to-right;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-new(root),
+  ::view-transition-old(root) {
+    animation: none;
+  }
+}
+
+// ─── Ensure [hidden] is always respected (prevents CSS display overrides) ─────
+[hidden] {
+  display: none !important; // stylelint-disable-line declaration-no-important
+}
+
+// ─── Full-page layout (MPA pages) ─────────────────────────────────────────────
+.full-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+
+  // dvh adapts to the visible viewport on mobile (excludes browser chrome)
+  height: 100dvh;
+  overflow: hidden;
+}
+
+// ─── Transaction buttons (side-by-side) ──────────────────────────────────────
+.tx-buttons {
+  display: flex;
+  gap: 0.75rem;
+
+  .btn {
+    flex: 1;
+  }
+}
+
+// ─── Pfand hint ───────────────────────────────────────────────────────────────
+.pfand-hint {
+  background: #e8f4fd;
+  border-left: 3px solid $color-secondary;
+  border-radius: 4px;
+  color: #555;
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
+}
+
+// ─── Setup actions (create page) ──────────────────────────────────────────────
+.setup-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+// ─── Import error text ────────────────────────────────────────────────────────
+.error-text {
+  color: $color-danger;
+  font-size: 0.85rem;
+  min-height: 1.2em;
+}
+
+// ─── Visually hidden (accessible file input) ──────────────────────────────────
+.visually-hidden {
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+// ─── Cancel-edit button ───────────────────────────────────────────────────────
+.btn-cancel-edit {
+  background: none;
+  border: none;
+  color: $color-danger;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.25rem;
+}
+
+// ─── Settings page ────────────────────────────────────────────────────────────
+.settings-actions-top {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.all-events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.all-event-row {
+  background: $color-subtle;
+  border-radius: $radius-sm;
+  display: grid;
+  font-size: 0.9rem;
+  gap: 0.25rem 0.5rem;
+  grid-template-columns: 1fr auto;
+  padding: 0.6rem 0.75rem;
+}
+
+.all-event-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.event-badge-active {
+  background: $color-primary;
+  border-radius: 4px;
+  color: $color-white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  white-space: nowrap;
+}
+
+.all-event-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.all-event-date {
+  color: #888;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.all-event-revenue {
+  color: $color-green;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.all-event-link {
+  color: $color-secondary;
+  font-size: 0.85rem;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.all-event-delete {
+  background: none;
+  border: none;
+  color: $color-danger;
+  cursor: pointer;
+  font-size: 0.85rem;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// ─── Error page ───────────────────────────────────────────────────────────────
+.error-page {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  justify-content: center;
+  min-height: 50vh;
+  padding: 2rem;
+  text-align: center;
+
+  p {
+    color: $color-muted;
+    font-size: 1rem;
+  }
+}
+
+// ─── Stats page ───────────────────────────────────────────────────────────────
+.stats-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.stats-section {
+  background: $color-white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  padding: 1rem;
+}
+
+.stat-cards {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+}
+
+.stat-card {
+  background: $color-bg;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+}
+
+.stat-card-label {
+  color: $color-muted;
+  font-size: 0.8rem;
+}
+
+.stat-card-value {
+  color: $color-header-bg;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+.items-table {
+  border-collapse: collapse;
+  width: 100%;
+
+  td,
+  th {
+    border-bottom: 1px solid #eee;
+    padding: 0.55rem 0.75rem;
+    text-align: left;
+  }
+
+  th {
+    color: $color-muted;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.chart-container {
+  background: $color-subtle;
+  border-radius: $radius-md;
+  overflow: hidden;
+  padding: 0.5rem;
+}
+
+// ─── Export button row ────────────────────────────────────────────────────────
+.export-row {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+// ─── Content pages (Impressum, Haftungsausschluss) ───────────────────────────
+.content-main {
+  flex: 1;
+  margin: 0 auto;
+  max-width: 800px;
+  overflow-y: auto;
+  padding: 1.25rem 1rem;
+  width: 100%;
+
+  h2 {
+    color: #333;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 1.25rem 0 0.5rem;
+  }
+
+  p {
+    color: #444;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    margin-bottom: 0.75rem;
+  }
+
+  ul {
+    color: #444;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    margin-bottom: 0.75rem;
+    padding-left: 1.5rem;
+  }
+
+  a {
+    color: $color-secondary;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// ─── Liability notice (create page) ──────────────────────────────────────────
+.liability-label {
+  align-items: flex-start;
+  color: #444;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.9rem;
+  font-weight: normal;
+  gap: 0.5rem;
+  line-height: 1.5;
+
+  a {
+    color: $color-secondary;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.liability-checkbox {
+  cursor: pointer;
+  flex-shrink: 0;
+  height: 18px;
+  margin-top: 0.15rem;
+  width: 18px;
+}

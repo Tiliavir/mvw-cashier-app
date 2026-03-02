@@ -1,0 +1,4 @@
+{{ define "content" }}
+  {{ $partial := printf "pages/%s.html" .Section }}
+  {{ partial $partial . }}
+{{ end }}
