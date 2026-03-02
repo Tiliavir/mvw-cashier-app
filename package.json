@@ -2,7 +2,7 @@
   "name": "mvw-cashier-app",
   "version": "1.0.0",
   "description": "Browser-based cashier app for club events",
-  "license": "MIT",
+  "license": "Unlicense",
   "author": "Tiliavir",
   "repository": {
     "type": "git",

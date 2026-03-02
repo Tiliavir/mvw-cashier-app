@@ -22,4 +22,4 @@ E-Mail: [email@example.com]
 ## Hinweis
 
 Dies ist ein privates, nicht-kommerzielles Hobbyprojekt.
-Der Quellcode ist als Open-Source unter der MIT-Lizenz verfügbar.
+Der Quellcode ist als Open-Source unter der Unlicense verfügbar.

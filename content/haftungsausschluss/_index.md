@@ -20,7 +20,7 @@ Nichtnutzbarkeit dieser Anwendung entstehen. Dies gilt insbesondere für:
 ## Open-Source-Projekt
 
 Der Quellcode dieser Anwendung ist unter der
-[MIT-Lizenz](https://opensource.org/licenses/MIT) frei verfügbar. Es wird keine
+[Unlicense](https://unlicense.org/) frei verfügbar. Es wird keine
 Garantie für Funktionsfähigkeit, Sicherheit oder Eignung für einen bestimmten Zweck
 übernommen.
 
