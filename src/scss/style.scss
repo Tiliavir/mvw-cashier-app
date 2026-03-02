@@ -870,3 +870,73 @@ html[data-direction="back"] {
   justify-content: flex-end;
   margin-top: 0.5rem;
 }
+
+// ─── Content pages (Impressum, Haftungsausschluss) ───────────────────────────
+.content-main {
+  flex: 1;
+  margin: 0 auto;
+  max-width: 800px;
+  overflow-y: auto;
+  padding: 1.25rem 1rem;
+  width: 100%;
+
+  h2 {
+    color: #333;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 1.25rem 0 0.5rem;
+  }
+
+  p {
+    color: #444;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    margin-bottom: 0.75rem;
+  }
+
+  ul {
+    color: #444;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    margin-bottom: 0.75rem;
+    padding-left: 1.5rem;
+  }
+
+  a {
+    color: $color-secondary;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// ─── Liability notice (create page) ──────────────────────────────────────────
+.liability-label {
+  align-items: flex-start;
+  color: #444;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.9rem;
+  font-weight: normal;
+  gap: 0.5rem;
+  line-height: 1.5;
+
+  a {
+    color: $color-secondary;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.liability-checkbox {
+  cursor: pointer;
+  flex-shrink: 0;
+  height: 18px;
+  margin-top: 0.15rem;
+  width: 18px;
+}

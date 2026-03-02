@@ -1,0 +1,8 @@
+baseURL = '/'
+languageCode = 'de'
+title = 'MVW Kassierer'
+enableRobotsTXT = true
+disableKinds = ['taxonomy', 'term', 'RSS']
+
+[params]
+  description = 'Browser-basierte Kasse für Vereinsfeste'

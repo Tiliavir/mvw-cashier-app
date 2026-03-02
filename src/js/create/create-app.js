@@ -29,11 +29,19 @@ const CreateApp = (function () {
   function init() {
     renderItems();
     bindEvents();
+    updateStartButton();
   }
 
   // ─── Render ───────────────────────────────────────────────────────────────
   function renderItems() {
     UI.renderSetupItems(pendingItems, editingItemId);
+  }
+
+  // ─── Update start button state ────────────────────────────────────────────
+  function updateStartButton() {
+    const btn = document.getElementById('btn-start-event');
+    const checkbox = document.getElementById('accept-liability');
+    if (btn) btn.disabled = !(checkbox && checkbox.checked);
   }
 
   // ─── Reorder helper ───────────────────────────────────────────────────────
@@ -50,6 +58,9 @@ const CreateApp = (function () {
   // ─── Bind events ─────────────────────────────────────────────────────────
   function bindEvents() {
     const container = document.getElementById('setup-items-list');
+
+    // Liability checkbox
+    on('accept-liability', 'change', updateStartButton);
 
     // Add item
     on('btn-add-item', 'click', function () {
@@ -267,8 +278,10 @@ const CreateApp = (function () {
     on('btn-start-event', 'click', function () {
       const nameInput = document.getElementById('event-name');
       const name = nameInput ? nameInput.value.trim() : '';
+      const checkbox = document.getElementById('accept-liability');
       if (!name) { alert('Bitte Veranstaltungsname eingeben.'); return; }
       if (pendingItems.length === 0) { alert('Bitte mindestens einen Artikel hinzufügen.'); return; }
+      if (!checkbox || !checkbox.checked) { alert('Bitte den Haftungsausschluss akzeptieren.'); return; }
       const currentState = Store.loadState();
       const event = Models.createEvent(name);
       event.items = pendingItems.slice();
