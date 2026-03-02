@@ -1,4 +1,5 @@
 import type { Event, Item } from './models';
+import type { AppState } from './storage';
 
 // ─── Format helpers ──────────────────────────────────────────────────
 function formatCurrency(value: number): string {
@@ -151,7 +152,7 @@ function renderTransactionBar(total: number, received: number, change: number): 
 
 // ─── Settings Screen ─────────────────────────────────────────────────
 function renderSettingsScreen(
-  state: any,
+  state: AppState,
   calculateEventTotals: (event: Event) => { revenue: number; transactionCount: number } // eslint-disable-line no-unused-vars
 ): void {
   showScreen('screen-settings');
@@ -247,4 +248,3 @@ export const UI = {
   escapeHtml,
   escapeAttr,
 };
-

@@ -1,8 +1,9 @@
 import { Models, Storage, UI, Paths } from '../shared/index';
+import type { Item } from '../shared/index';
 
 // ─── Create Page ──────────────────────────────────────────────────────────────
 const CreateApp = (() => {
-  let pendingItems: any[] = [];
+  let pendingItems: Item[] = [];
   let editingItemId: string | null = null;
   let dragSrcId: string | null = null;
   let touchDragSrcId: string | null = null;
@@ -43,8 +44,8 @@ const CreateApp = (() => {
 
   function onDropReorder(srcId: string, dstId: string): void {
     if (!srcId || srcId === dstId) return;
-    const srcIdx = pendingItems.findIndex((i: any) => i.id === srcId);
-    const dstIdx = pendingItems.findIndex((i: any) => i.id === dstId);
+    const srcIdx = pendingItems.findIndex((i: Item) => i.id === srcId);
+    const dstIdx = pendingItems.findIndex((i: Item) => i.id === dstId);
     if (srcIdx < 0 || dstIdx < 0) return;
     const [moved] = pendingItems.splice(srcIdx, 1);
     pendingItems.splice(dstIdx, 0, moved);
@@ -86,7 +87,7 @@ const CreateApp = (() => {
         const target = e.target as HTMLElement;
         const removeBtn = target.closest('.btn-remove-item');
         if (removeBtn) {
-          pendingItems = pendingItems.filter((i: any) => i.id !== (removeBtn as any).dataset.id);
+          pendingItems = pendingItems.filter((i: Item) => i.id !== (removeBtn as HTMLElement).dataset.id);
           editingItemId = null;
           renderItems();
           return;
@@ -94,7 +95,7 @@ const CreateApp = (() => {
 
         const saveBtn = target.closest('.btn-save-item');
         if (saveBtn) {
-          const id = (saveBtn as any).dataset.id;
+          const id = (saveBtn as HTMLElement).dataset.id;
           const row = container.querySelector(`[data-id="${id}"]`);
           if (!row) return;
           const nameInput = row.querySelector('.edit-name') as HTMLInputElement;
@@ -105,7 +106,7 @@ const CreateApp = (() => {
             alert('Bitte Artikelname eingeben.');
             return;
           }
-          const idx = pendingItems.findIndex((i: any) => i.id === id);
+          const idx = pendingItems.findIndex((i: Item) => i.id === id);
           if (idx >= 0) {
             pendingItems[idx] = {
               ...pendingItems[idx],
@@ -128,7 +129,7 @@ const CreateApp = (() => {
         if (target.closest('.btn-remove-item')) return;
         const row = target.closest('.setup-item-row');
         if (!row || row.classList.contains('setup-item-edit')) return;
-        editingItemId = (row as any).dataset.id;
+        editingItemId = (row as HTMLElement).dataset.id;
         renderItems();
       });
 
@@ -141,7 +142,7 @@ const CreateApp = (() => {
       if (nameInput && !nameInput.value.trim()) {
         nameInput.value = 'Vereinsfest';
       }
-      pendingItems = EXAMPLE_ITEMS.map((cfg: any) => Models.createItem(cfg.name, cfg.price, cfg.color));
+      pendingItems = EXAMPLE_ITEMS.map((cfg) => Models.createItem(cfg.name, cfg.price, cfg.color));
       editingItemId = null;
       renderItems();
     });
@@ -166,8 +167,8 @@ const CreateApp = (() => {
             }
             const nameInput = document.getElementById('event-name') as HTMLInputElement;
             if (nameInput) nameInput.value = data.name;
-            pendingItems = data.items.map((it: any) =>
-              Models.createItem(it.name || '', it.price || 0, it.color || '#cccccc')
+            pendingItems = data.items.map((it: Record<string, unknown>) =>
+              Models.createItem(it.name as string || '', it.price as number || 0, it.color as string || '#cccccc')
             );
             editingItemId = null;
             renderItems();
@@ -211,7 +212,7 @@ const CreateApp = (() => {
       const event = e as DragEvent;
       const row = (event.target as HTMLElement).closest('.setup-item-row');
       if (!row) return;
-      dragSrcId = (row as any).dataset.id;
+      dragSrcId = (row as HTMLElement).dataset.id;
       if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
       row.classList.add('dragging');
     });
@@ -231,7 +232,7 @@ const CreateApp = (() => {
       event.preventDefault();
       if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
       const row = (event.target as HTMLElement).closest('.setup-item-row');
-      if (!row || (row as any).dataset.id === dragSrcId) return;
+      if (!row || (row as HTMLElement).dataset.id === dragSrcId) return;
       document.querySelectorAll('.setup-item-row.drag-over').forEach((el) => {
         el.classList.remove('drag-over');
       });
@@ -250,7 +251,7 @@ const CreateApp = (() => {
       const row = (event.target as HTMLElement).closest('.setup-item-row');
       if (!row) return;
       row.classList.remove('drag-over');
-      const dropId = (row as any).dataset.id;
+      const dropId = (row as HTMLElement).dataset.id;
       if (dragSrcId && dragSrcId !== dropId) {
         onDropReorder(dragSrcId, dropId);
       }
@@ -266,7 +267,7 @@ const CreateApp = (() => {
         if (!handle) return;
         const row = handle.closest('.setup-item-row');
         if (!row) return;
-        touchDragSrcId = (row as any).dataset.id;
+        touchDragSrcId = (row as HTMLElement).dataset.id;
         event.preventDefault();
         touchClone = row.cloneNode(true) as HTMLElement;
         touchClone.style.cssText = `left:0;opacity:0.7;pointer-events:none;position:fixed;top:0;width:${row.offsetWidth}px;z-index:1000;`;
@@ -292,7 +293,7 @@ const CreateApp = (() => {
         });
         const el = document.elementFromPoint(touch.clientX, touch.clientY);
         const row = el ? el.closest('.setup-item-row') : null;
-        if (row && (row as any).dataset.id !== touchDragSrcId) row.classList.add('drag-over');
+        if (row && (row as HTMLElement).dataset.id !== touchDragSrcId) row.classList.add('drag-over');
       },
       { passive: false }
     );
@@ -310,8 +311,8 @@ const CreateApp = (() => {
       const touch = event.changedTouches[0];
       const el = document.elementFromPoint(touch.clientX, touch.clientY);
       const row = el ? el.closest('.setup-item-row') : null;
-      if (row && (row as any).dataset.id !== touchDragSrcId) {
-        onDropReorder(touchDragSrcId, (row as any).dataset.id);
+      if (row && (row as HTMLElement).dataset.id !== touchDragSrcId) {
+        onDropReorder(touchDragSrcId, (row as HTMLElement).dataset.id);
       }
       touchDragSrcId = null;
     });

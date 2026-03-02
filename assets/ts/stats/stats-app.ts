@@ -1,4 +1,5 @@
 import { Models, Storage, UI, Paths } from '../shared/index';
+import type { Event, ItemSoldInfo, Transaction } from '../shared/index';
 
 // ─── Stats Page ───────────────────────────────────────────────────────────────
 const StatsApp = (() => {
@@ -29,7 +30,7 @@ const StatsApp = (() => {
     });
   }
 
-  function renderStatCards(event: any): void {
+  function renderStatCards(event: Event): void {
     const container = document.getElementById('stat-cards');
     if (!container) return;
     const totals = Models.calculateEventTotals(event);
@@ -54,12 +55,12 @@ const StatsApp = (() => {
     });
   }
 
-  function renderItemsTable(event: any): void {
+  function renderItemsTable(event: Event): void {
     const tbody = document.getElementById('items-table-body');
     if (!tbody) return;
     const sold = Models.calculateItemsSold(event);
 
-    const entries = Object.values(sold).sort((a: any, b: any) => b.quantity - a.quantity);
+    const entries = Object.values(sold).sort((a: ItemSoldInfo, b: ItemSoldInfo) => b.quantity - a.quantity);
 
     if (entries.length === 0) {
       const tr = document.createElement('tr');
@@ -72,7 +73,7 @@ const StatsApp = (() => {
       return;
     }
 
-    entries.forEach((entry: any) => {
+    entries.forEach((entry: ItemSoldInfo) => {
       const tr = document.createElement('tr');
       const nameTd = document.createElement('td');
       nameTd.textContent = entry.name;
@@ -87,7 +88,7 @@ const StatsApp = (() => {
     });
   }
 
-  function renderCharts(event: any): void {
+  function renderCharts(event: Event): void {
     const countContainer = document.getElementById('stats-chart-count');
     const amountContainer = document.getElementById('stats-chart-amount');
     if (!countContainer || !amountContainer) return;
@@ -100,7 +101,7 @@ const StatsApp = (() => {
     }
 
     const hourMap: Record<string, { label: string; count: number; amount: number }> = {};
-    transactions.forEach((tx: any) => {
+    transactions.forEach((tx: Transaction) => {
       const date = new Date(tx.timestamp);
       const key = date.toISOString().slice(0, 13);
       if (!hourMap[key]) {
