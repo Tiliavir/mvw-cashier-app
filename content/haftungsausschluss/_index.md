@@ -1,6 +1,7 @@
 ---
 title: 'Haftungsausschluss'
 description: 'Haftungsausschluss - MVW Kassierer'
+keywords: ['Haftungsausschluss', 'Nutzung', 'Rechtliches']
 ---
 
 ## Nutzung auf eigene Gefahr
@@ -20,7 +21,7 @@ Nichtnutzbarkeit dieser Anwendung entstehen. Dies gilt insbesondere für:
 ## Open-Source-Projekt
 
 Der Quellcode dieser Anwendung ist unter der
-[Unlicense](https://unlicense.org/) frei verfügbar. Es wird keine
+[MIT License](https://opensource.org/license/MIT/) frei verfügbar. Es wird keine
 Garantie für Funktionsfähigkeit, Sicherheit oder Eignung für einen bestimmten Zweck
 übernommen.
 

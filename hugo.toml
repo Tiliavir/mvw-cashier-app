@@ -3,6 +3,19 @@ languageCode = 'de'
 title = 'MVW Kassierer'
 enableRobotsTXT = true
 disableKinds = ['taxonomy', 'term', 'RSS']
+assetDir = 'assets'
+
+[build]
+  [[build.cachebusters]]
+    source = 'assets/(?:scss|ts)/'
+    target = 'css|js'
+
+  [build.js]
+    minify = true
+    target = 'es2020'
+    format = 'iife'
+    treeShaking = true
 
 [params]
   description = 'Browser-basierte Kasse für Vereinsfeste'
+  author = 'Markus Lindenmann'

@@ -1,35 +1,32 @@
 import js from "@eslint/js";
 import globals from "globals";
+import tsParser from "@typescript-eslint/parser";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
 
 export default [
   js.configs.recommended,
   {
-    files: ["src/js/**/*.js"],
+    files: ["assets/ts/**/*.ts", "tests/e2e/**/*.ts"],
     languageOptions: {
-      sourceType: "script",
+      parser: tsParser,
+      parserOptions: {
+        sourceType: "module",
+        project: "./tsconfig.json",
+      },
       globals: {
         ...globals.browser,
-        module: "readonly",
       },
+    },
+    plugins: {
+      "@typescript-eslint": tsPlugin,
     },
     rules: {
-      "no-unused-vars": ["error", { "caughtErrorsIgnorePattern": "^_" }],
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+      "@typescript-eslint/no-explicit-any": "warn",
     },
   },
   {
-    // page scripts consume the namespaces defined in the other script files
-    files: ["src/js/app.js", "src/js/*/create-app.js", "src/js/*/edit-app.js", "src/js/*/settings-app.js", "src/js/*/stats-app.js"],
-    languageOptions: {
-      globals: {
-        Models: "readonly",
-        Store: "readonly",
-        UI: "readonly",
-        Paths: "readonly",
-      },
-    },
-  },
-  {
-    files: ["tests/**/*.js"],
+    files: ["scripts/**/*.js"],
     languageOptions: {
       sourceType: "commonjs",
       globals: {
@@ -38,15 +35,6 @@ export default [
     },
   },
   {
-    ignores: ["node_modules/", "public/**/*.js", "static/**/*.js"],
-  },
-  {
-    files: ["scripts/**/*.js", "postcss.config.js"],
-    languageOptions: {
-      sourceType: "commonjs",
-      globals: {
-        ...globals.node,
-      },
-    },
+    ignores: ["node_modules/", "public/", "static/"],
   },
 ];
