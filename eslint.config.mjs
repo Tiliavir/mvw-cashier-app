@@ -38,7 +38,7 @@ export default [
     },
   },
   {
-    ignores: ["node_modules/", "public/**/*.js"],
+    ignores: ["node_modules/", "public/**/*.js", "static/**/*.js"],
   },
   {
     files: ["scripts/**/*.js", "postcss.config.js"],

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  {{ partial "head.html" . }}
+</head>
+<body class="full-page">
+
+  <header class="app-header">
+    <button onclick="history.back()" class="btn btn-back" aria-label="Zurück">
+      ← Zurück
+    </button>
+    <h1>{{ .Title }}</h1>
+  </header>
+
+  <main class="content-main">
+    {{ .Content }}
+  </main>
+
+</body>
+</html>

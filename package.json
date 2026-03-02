@@ -2,18 +2,20 @@
   "name": "mvw-cashier-app",
   "version": "1.0.0",
   "description": "Browser-based cashier app for club events",
-  "license": "MIT",
+  "license": "Unlicense",
   "author": "Tiliavir",
   "repository": {
     "type": "git",
     "url": "https://github.com/Tiliavir/mvw-cashier-app.git"
   },
   "scripts": {
-    "build:css": "sass src/scss/style.scss | postcss --no-map --output public/css/style.css",
+    "build:css": "sass src/scss/style.scss | postcss --no-map --output static/css/style.css",
     "build:js": "node scripts/build-js.js",
-    "compile": "npm run build:css && npm run build:js",
+    "build:assets": "npm run build:css && npm run build:js",
+    "build:hugo": "hugo --cleanDestinationDir",
+    "compile": "npm run build:assets && npm run build:hugo",
     "lint": "stylelint src/scss/style.scss && eslint .",
-    "validate": "npx vnu --skip-non-html public/index.html public/create/index.html public/edit/index.html public/settings/index.html public/stats/index.html",
+    "validate": "npx vnu --skip-non-html public/index.html public/create/index.html public/edit/index.html public/settings/index.html public/stats/index.html public/impressum/index.html public/haftungsausschluss/index.html",
     "test": "node tests/unit.test.js",
     "build": "npm run compile && npm run lint && npm run validate && npm run test"
   },

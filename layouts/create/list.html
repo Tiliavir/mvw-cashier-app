@@ -1,20 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Neue Veranstaltung anlegen - MVW Kassierer">
-  <meta name="theme-color" content="#1a1a2e">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta property="og:title" content="Neue Veranstaltung - MVW Kassierer">
-  <meta property="og:description" content="Neue Veranstaltung anlegen">
-  <meta property="og:type" content="website">
-  <base href="/">
-  <title>Neue Veranstaltung - MVW Kassierer</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="favicon.svg">
-  <link rel="stylesheet" href="css/style.css">
+  {{ partial "head.html" . }}
 </head>
 <body class="full-page">
 
@@ -86,15 +73,23 @@
       <p id="import-error" class="error-text" aria-live="polite"></p>
     </section>
 
-    <button id="btn-start-event" class="btn btn-primary btn-full">
+    <section class="setup-section">
+      <h2 class="section-title">Rechtliches</h2>
+      <label for="accept-liability" class="liability-label">
+        <input id="accept-liability" type="checkbox" class="liability-checkbox">
+        Ich habe den
+        <a href="haftungsausschluss/" target="_blank" rel="noopener">Haftungsausschluss</a>
+        gelesen und akzeptiere die Nutzungsbedingungen.
+        Das <a href="impressum/" target="_blank" rel="noopener">Impressum</a> habe ich zur Kenntnis genommen.
+      </label>
+    </section>
+
+    <button id="btn-start-event" class="btn btn-primary btn-full" disabled>
       Veranstaltung starten ▶
     </button>
   </main>
 
-  <script src="shared/js/models.js"></script>
-  <script src="shared/js/storage.js"></script>
-  <script src="shared/js/ui.js"></script>
-  <script src="shared/js/paths.js"></script>
+  {{ partial "scripts-shared.html" . }}
   <script src="create/js/create-app.js"></script>
 </body>
 </html>
