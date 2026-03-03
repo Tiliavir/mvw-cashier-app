@@ -1,4 +1,4 @@
-import { Models, Storage, UI, Paths } from '../shared/index';
+import { Models, Storage, UI } from '../shared/index';
 
 // ─── Settings Page ────────────────────────────────────────────────────────────
 const SettingsApp = (() => {
@@ -75,12 +75,12 @@ const SettingsApp = (() => {
 
       const editLink = document.createElement('a');
       editLink.className = 'all-event-link';
-      editLink.href = Paths.page('edit', { id: event.id });
+      editLink.href = new URL(`edit/?id=${event.id}`, document.baseURI).href;
       editLink.textContent = 'Bearbeiten';
 
       const statsLink = document.createElement('a');
       statsLink.className = 'all-event-link';
-      statsLink.href = Paths.page('stats', { id: event.id });
+      statsLink.href = new URL(`stats/?id=${event.id}`, document.baseURI).href;
       statsLink.textContent = 'Statistik';
 
       const deleteBtn = document.createElement('button');
@@ -112,7 +112,7 @@ const SettingsApp = (() => {
   function bindEvents(): void {
     on('btn-back-cashier', 'click', () => {
       sessionStorage.setItem('vt-direction', 'back');
-      location.href = Paths.page('');
+      location.href = (document.getElementById('btn-back-cashier') as HTMLElement).dataset.href!;
     });
 
     on('btn-close-event', 'click', () => {

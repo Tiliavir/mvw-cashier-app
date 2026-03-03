@@ -1,4 +1,4 @@
-import { Models, Storage, UI, Paths } from '../shared/index';
+import { Models, Storage, UI } from '../shared/index';
 import type { Item } from '../shared/index';
 
 // ─── Create Page ──────────────────────────────────────────────────────────────
@@ -202,7 +202,7 @@ const CreateApp = (() => {
       const event = Models.createEvent(name);
       event.items = pendingItems.slice();
       Storage.addEvent(currentState, event);
-      location.href = Paths.page('');
+      location.href = document.baseURI;
     });
   }
 

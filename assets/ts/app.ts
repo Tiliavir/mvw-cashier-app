@@ -1,4 +1,4 @@
-import { Models, Storage, UI, Paths } from './shared/index';
+import { Models, Storage, UI } from './shared/index';
 
 // ─── App State ────────────────────────────────────────────────────────────────
 const App = (() => {
@@ -11,7 +11,7 @@ const App = (() => {
     state = Storage.loadState();
     const active = Storage.getActiveEvent(state);
     if (!active) {
-      location.replace(Paths.page('create'));
+      location.replace(new URL('create/', document.baseURI).href);
       return;
     }
     const title = document.getElementById('cashier-event-name');
@@ -117,7 +117,7 @@ const App = (() => {
 
     // Settings navigation
     on('btn-settings', 'click', () => {
-      location.href = Paths.page('settings');
+      location.href = (document.getElementById('btn-settings') as HTMLElement).dataset.href!;
     });
   }
 

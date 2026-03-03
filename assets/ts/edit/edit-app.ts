@@ -1,4 +1,4 @@
-import { Models, Storage, UI, Paths } from '../shared/index';
+import { Models, Storage, UI } from '../shared/index';
 
 // ─── Edit Page ────────────────────────────────────────────────────────────────
 const EditApp = (() => {
@@ -58,7 +58,7 @@ const EditApp = (() => {
 
     on('btn-back-settings', 'click', () => {
       sessionStorage.setItem('vt-direction', 'back');
-      location.href = Paths.page('settings');
+      location.href = (document.getElementById('btn-back-settings') as HTMLElement).dataset.href!;
     });
 
     on('btn-add-item', 'click', () => {

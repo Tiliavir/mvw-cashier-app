@@ -1,4 +1,4 @@
-import { Models, Storage, UI, Paths } from '../shared/index';
+import { Models, Storage, UI } from '../shared/index';
 import type { Event, ItemSoldInfo, Transaction } from '../shared/index';
 
 // ─── Stats Page ───────────────────────────────────────────────────────────────
@@ -26,7 +26,7 @@ const StatsApp = (() => {
 
     on('btn-back-settings', 'click', () => {
       sessionStorage.setItem('vt-direction', 'back');
-      location.href = Paths.page('settings');
+      location.href = (document.getElementById('btn-back-settings') as HTMLElement).dataset.href!;
     });
   }
 
