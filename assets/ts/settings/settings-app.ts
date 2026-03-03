@@ -112,7 +112,7 @@ const SettingsApp = (() => {
   function bindEvents(): void {
     on('btn-back-cashier', 'click', () => {
       sessionStorage.setItem('vt-direction', 'back');
-      location.href = (document.getElementById('btn-back-cashier') as HTMLElement).dataset.href!;
+      location.href = document.baseURI;
     });
 
     on('btn-close-event', 'click', () => {
