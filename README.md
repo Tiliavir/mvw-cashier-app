@@ -75,27 +75,33 @@ hugo server            # serves at http://localhost:1313/
 │   └── partials/
 │       ├── head.html           # Shared <head> with base URL + meta tags
 │       └── scripts-shared.html # Shared <script> tags
-├── static/                 # Static assets copied verbatim by Hugo
-│   └── favicon.svg         # (compiled CSS/JS also go here, but are gitignored)
-├── src/                    # Source files — edit these
-│   ├── js/
-│   │   ├── app.js              # Cashier logic
-│   │   ├── create/create-app.js
-│   │   ├── edit/edit-app.js
-│   │   ├── settings/settings-app.js
-│   │   ├── stats/stats-app.js
-│   │   └── shared/
-│   │       ├── models.js   # Pure model factories + calculations
-│   │       ├── storage.js  # localStorage read/write
-│   │       ├── ui.js       # DOM rendering helpers
-│   │       └── paths.js    # URL helpers
-│   └── scss/
-│       └── style.scss      # All styles (SCSS source)
-├── scripts/
-│   └── build-js.js         # Minifies src/js/ → static/ via terser
-├── postcss.config.js       # autoprefixer + cssnano
-├── tests/
-│   └── unit.test.js        # Node.js unit tests (no framework needed)
+├── static/                 # Static assets (committed: favicon; gitignored: compiled CSS/JS)
+│   └── favicon.svg
+├── assets/ts/              # TypeScript source files (compiled by Hugo)
+│   ├── app.ts              # Cashier logic
+│   ├── create/create-app.ts
+│   ├── edit/edit-app.ts
+│   ├── settings/settings-app.ts
+│   ├── stats/stats-app.ts
+│   └── shared/
+│       ├── index.ts        # Re-exports all shared modules
+│       ├── models.ts       # Pure model factories + calculations
+│       ├── storage.ts      # localStorage read/write
+│       └── ui.ts          # DOM rendering helpers
+├── assets/scss/           # SCSS source files
+│   └── style.scss
+├── scripts/               # Build scripts
+│   └── run-playwright.js  # Playwright test runner
+├── tests/e2e/             # Playwright E2E tests
+│   ├── cashier.spec.ts
+│   ├── create-event.spec.ts
+│   ├── settings.spec.ts
+│   ├── stats.spec.ts
+│   └── utils.ts
+├── tsconfig.json           # TypeScript config
+├── eslint.config.mjs       # ESLint config
+├── .stylelintrc           # Stylelint config
+├── playwright.config.ts    # Playwright config
 └── .github/
     ├── dependabot.yml
     └── workflows/
@@ -103,29 +109,26 @@ hugo server            # serves at http://localhost:1313/
         └── release.yml # Tag v* → GitHub Release + GitHub Pages deploy
 ```
 
-> **Build artifacts are gitignored:** `static/css/`, `static/js/`, `static/shared/` (compiled JS), and `public/` (Hugo output) are all generated — never committed.
+> **Build artifacts are gitignored:** `static/css/`, `static/js/` (compiled TypeScript), and `public/` (Hugo output) are all generated — never committed.
 
 ---
 
 ## Build Pipeline
 
 ```
-src/scss/style.scss  ──(sass + PostCSS)──► static/css/style.css  ─┐
-src/js/**/*.js       ──(terser)──────────► static/**/*.js          ├─► Hugo ──► public/
-content/ + layouts/  ──────────────────────────────────────────────┘
+assets/scss/style.scss  ──(sass + PostCSS)──► static/css/app.css  ─┐
+assets/ts/**/*.ts      ──(Hugo asset pipeline)──► static/js/      ├─► Hugo ──► public/
+content/ + layouts/    ────────────────────────────────────────────┘
 ```
 
 | Script | What it does |
 |--------|-------------|
-| `npm run build:css` | SCSS → `static/css/style.css` |
-| `npm run build:js` | JS minification → `static/**/*.js` |
-| `npm run build:assets` | CSS + JS (no Hugo) |
-| `npm run build:hugo` | Hugo build → `public/` |
-| `npm run compile` | All of the above |
+| `npm run compile` | Compile assets + Hugo build → `public/` |
 | `npm run lint` | stylelint + eslint |
 | `npm run validate` | vnu-jar HTML validation |
-| `npm run test` | Unit tests |
+| `npm run test` | Playwright E2E tests |
 | `npm run build` | compile + lint + validate + test |
+| `npm run dev` | Hugo serve with live-reload |
 
 ---
 
@@ -159,14 +162,17 @@ The Haftungsausschluss (liability disclaimer) is at `content/haftungsausschluss/
 ## Development Setup
 
 ```bash
-# Lint CSS and JS
+# Compile assets and Hugo
+npm run compile
+
+# Lint SCSS and TypeScript
 npm run lint
 
 # Validate HTML (requires a compile step first)
 npm run validate
 
-# Run unit tests
-node tests/unit.test.js
+# Run Playwright E2E tests (requires compile first)
+npm run test
 
 # Full check (compile + lint + validate + test)
 npm run build
