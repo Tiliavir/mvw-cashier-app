@@ -26,7 +26,7 @@ export default [
     },
   },
   {
-    files: ["scripts/**/*.js"],
+    files: ["scripts/**/*.js", "tests/scripts/**/*.js"],
     languageOptions: {
       sourceType: "commonjs",
       globals: {
