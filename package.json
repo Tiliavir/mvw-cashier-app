@@ -23,7 +23,7 @@
     "@typescript-eslint/parser": "^8.66.0",
     "@types/node": "^26.1.2",
     "eslint": "10.8.0",
-    "globals": "17.8.0",
+    "globals": "17.10.0",
     "sass": "^1.102.0",
     "stylelint": "17.14.1",
     "stylelint-config-standard": "40.0.0",
