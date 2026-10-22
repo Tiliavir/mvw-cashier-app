@@ -47,7 +47,7 @@ jobs:
 
       - name: Setup GitHub Pages
         id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Build Hugo site
         run: hugo --cleanDestinationDir --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
