@@ -7,6 +7,9 @@ updates:
     labels:
       - "dependencies"
       - "automerge"
+    groups:
+      github-actions:
+        patterns: ["*"]
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
@@ -14,3 +17,7 @@ updates:
     labels:
       - "dependencies"
       - "automerge"
+    groups:
+      npm-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
