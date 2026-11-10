@@ -3,7 +3,7 @@ import type { AppState } from './storage';
 
 // ─── Format helpers ──────────────────────────────────────────────────
 function formatCurrency(value: number): string {
-  return value.toFixed(2).replace('.', ',') + ' €';
+  return `${value.toFixed(2).replace('.', ',')} €`;
 }
 
 function formatDate(isoString: string): string {
@@ -37,7 +37,7 @@ function renderSetupScreen(): void {
 }
 
 // ─── Item list rendering (setup and settings) ────────────────────────
-function renderSetupItems(items: Item[], editingItemId?: string, containerId?: string): void {
+function renderSetupItems(items: Item[], editingItemId: string | null, containerId?: string): void {
   const container = document.getElementById(containerId || 'setup-items-list');
   if (!container) return;
   container.innerHTML = '';
@@ -113,7 +113,7 @@ function renderItemGrid(items: Item[], cart: Record<string, number>): void {
     tile.className = 'item-tile';
     tile.style.backgroundColor = item.color;
     tile.dataset.id = item.id;
-    tile.setAttribute('aria-label', item.name + ' ' + formatCurrency(item.price));
+    tile.setAttribute('aria-label', `${item.name} ${formatCurrency(item.price)}`);
 
     const nameEl = document.createElement('span');
     nameEl.className = 'tile-name';
@@ -139,7 +139,7 @@ function renderItemGrid(items: Item[], cart: Record<string, number>): void {
 }
 
 // ─── Transaction bar ─────────────────────────────────────────────────
-function renderTransactionBar(total: number, received: number, change: number): void {
+function renderTransactionBar(total: number, _received: number, change: number): void {
   const totalEl = document.getElementById('tx-total');
   if (totalEl) totalEl.textContent = formatCurrency(total);
 
@@ -153,7 +153,7 @@ function renderTransactionBar(total: number, received: number, change: number): 
 // ─── Settings Screen ─────────────────────────────────────────────────
 function renderSettingsScreen(
   state: AppState,
-  calculateEventTotals: (event: Event) => { revenue: number; transactionCount: number } // eslint-disable-line no-unused-vars
+  calculateEventTotals: (event: Event) => { revenue: number; transactionCount: number },
 ): void {
   showScreen('screen-settings');
 
@@ -182,7 +182,7 @@ function renderSettingsScreen(
 
 function renderPastEvents(
   events: Event[],
-  calculateEventTotals: (event: Event) => { revenue: number; transactionCount: number } // eslint-disable-line no-unused-vars
+  calculateEventTotals: (event: Event) => { revenue: number; transactionCount: number },
 ): void {
   const container = document.getElementById('past-events-list');
   if (!container) return;

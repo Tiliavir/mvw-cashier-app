@@ -1,5 +1,3 @@
-'use strict';
-
 const { createServer } = require('node:net');
 const { spawn } = require('node:child_process');
 
@@ -25,4 +23,3 @@ function getFreePort() {
     process.exit(code ?? 1);
   });
 })();
-

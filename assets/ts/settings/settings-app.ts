@@ -86,15 +86,18 @@ const SettingsApp = (() => {
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'all-event-delete';
       deleteBtn.textContent = 'Löschen';
-      deleteBtn.addEventListener('click', (() => {
-        const ev = event;
-        return () => {
-          if (!confirm('Veranstaltung "' + ev.name + '" wirklich löschen?')) return;
-          state = Storage.deleteEvent(state, ev.id);
-          renderActiveEvent();
-          renderAllEvents();
-        };
-      })());
+      deleteBtn.addEventListener(
+        'click',
+        (() => {
+          const ev = event;
+          return () => {
+            if (!confirm(`Veranstaltung "${ev.name}" wirklich löschen?`)) return;
+            state = Storage.deleteEvent(state, ev.id);
+            renderActiveEvent();
+            renderAllEvents();
+          };
+        })(),
+      );
 
       actionsDiv.appendChild(editLink);
       actionsDiv.appendChild(statsLink);
@@ -118,7 +121,7 @@ const SettingsApp = (() => {
     on('btn-close-event', 'click', () => {
       const active = Storage.getActiveEvent(state);
       if (!active) return;
-      if (!confirm('Veranstaltung "' + active.name + '" wirklich beenden?')) return;
+      if (!confirm(`Veranstaltung "${active.name}" wirklich beenden?`)) return;
       state = Storage.closeEvent(state, active.id);
       renderActiveEvent();
       renderAllEvents();

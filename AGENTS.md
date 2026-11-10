@@ -68,7 +68,7 @@ npm run build
 # Compile assets and Hugo (outputs to public/)
 npm run compile
 
-# Lint SCSS and TypeScript
+# Lint SCSS and TypeScript (stylelint, Biome, tsc)
 npm run lint
 
 # Validate HTML (requires compile first)
@@ -186,8 +186,8 @@ npm run compile && npx playwright test tests/e2e/cashier.spec.ts -g "test name"
 
 ## Configuration Files
 
-- `tsconfig.json` - TypeScript config (strict mode, ES2020 target)
-- `eslint.config.mjs` - ESLint with TypeScript parser
+- `tsconfig.json` - TypeScript 7 config (strict mode, ES2020 target); type-checked with `tsc --noEmit` in `npm run lint`
+- `biome.json` - Biome lint + format for TS/JS/JSON (`npm run format` applies fixes)
 - `.stylelintrc` - Stylelint for SCSS
 - `playwright.config.ts` - Playwright config
 - `hugo.toml` - Hugo config with asset pipeline settings

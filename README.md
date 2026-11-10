@@ -99,7 +99,7 @@ hugo server            # serves at http://localhost:1313/
 │   ├── stats.spec.ts
 │   └── utils.ts
 ├── tsconfig.json           # TypeScript config
-├── eslint.config.mjs       # ESLint config
+├── biome.json              # Biome lint + format config
 ├── .stylelintrc           # Stylelint config
 ├── playwright.config.ts    # Playwright config
 └── .github/
@@ -116,7 +116,7 @@ hugo server            # serves at http://localhost:1313/
 ## Build Pipeline
 
 ```
-assets/scss/style.scss  ──(sass + PostCSS)──► static/css/app.css  ─┐
+assets/scss/style.scss  ──(Hugo toCSS)─────► static/css/app.css  ─┐
 assets/ts/**/*.ts      ──(Hugo asset pipeline)──► static/js/      ├─► Hugo ──► public/
 content/ + layouts/    ────────────────────────────────────────────┘
 ```
@@ -124,7 +124,8 @@ content/ + layouts/    ───────────────────
 | Script | What it does |
 |--------|-------------|
 | `npm run compile` | Compile assets + Hugo build → `public/` |
-| `npm run lint` | stylelint + eslint |
+| `npm run lint` | stylelint + Biome + tsc type check |
+| `npm run format` | apply Biome formatting and safe fixes |
 | `npm run validate` | vnu-jar HTML validation |
 | `npm run test` | Playwright E2E tests |
 | `npm run build` | compile + lint + validate + test |
@@ -165,7 +166,7 @@ The Haftungsausschluss (liability disclaimer) is at `content/haftungsausschluss/
 # Compile assets and Hugo
 npm run compile
 
-# Lint SCSS and TypeScript
+# Lint SCSS and TypeScript (stylelint, Biome, tsc)
 npm run lint
 
 # Validate HTML (requires a compile step first)

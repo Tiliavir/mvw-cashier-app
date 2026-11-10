@@ -58,7 +58,8 @@ const EditApp = (() => {
 
     on('btn-back-settings', 'click', () => {
       sessionStorage.setItem('vt-direction', 'back');
-      location.href = (document.getElementById('btn-back-settings') as HTMLElement).dataset.href!;
+      const href = (document.getElementById('btn-back-settings') as HTMLElement).dataset.href;
+      if (href) location.href = href;
     });
 
     on('btn-add-item', 'click', () => {
@@ -97,7 +98,7 @@ const EditApp = (() => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = event.name.replace(/[^a-z0-9äöüß]/gi, '_') + '.json';
+      a.download = `${event.name.replace(/[^a-z0-9äöüß]/gi, '_')}.json`;
       a.click();
       URL.revokeObjectURL(url);
     });
@@ -110,7 +111,8 @@ const EditApp = (() => {
 
         const removeBtn = target.closest('.btn-remove-item');
         if (removeBtn) {
-          if (eventId) state = Storage.removeItemFromEvent(state, eventId, (removeBtn as HTMLElement).dataset.id);
+          const removeId = (removeBtn as HTMLElement).dataset.id;
+          if (eventId && removeId) state = Storage.removeItemFromEvent(state, eventId, removeId);
           editingItemId = null;
           renderItems();
           return;
@@ -153,7 +155,7 @@ const EditApp = (() => {
         if (target.closest('.btn-remove-item')) return;
         const row = target.closest('.setup-item-row');
         if (!row || row.classList.contains('setup-item-edit')) return;
-        editingItemId = (row as HTMLElement).dataset.id;
+        editingItemId = (row as HTMLElement).dataset.id ?? null;
         renderItems();
       });
 
@@ -166,7 +168,7 @@ const EditApp = (() => {
       const event = e as DragEvent;
       const row = (event.target as HTMLElement).closest('.setup-item-row');
       if (!row) return;
-      dragSrcId = (row as HTMLElement).dataset.id;
+      dragSrcId = (row as HTMLElement).dataset.id ?? null;
       if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
       row.classList.add('dragging');
     });
@@ -206,7 +208,7 @@ const EditApp = (() => {
       if (!row) return;
       row.classList.remove('drag-over');
       const dropId = (row as HTMLElement).dataset.id;
-      if (dragSrcId && dragSrcId !== dropId) {
+      if (dragSrcId && dropId && dragSrcId !== dropId) {
         onDropReorder(dragSrcId, dropId);
       }
       dragSrcId = null;
@@ -218,18 +220,18 @@ const EditApp = (() => {
         const event = e as TouchEvent;
         const handle = (event.target as HTMLElement).closest('.drag-handle');
         if (!handle) return;
-        const row = handle.closest('.setup-item-row');
+        const row = handle.closest<HTMLElement>('.setup-item-row');
         if (!row) return;
-        touchDragSrcId = (row as HTMLElement).dataset.id;
+        touchDragSrcId = (row as HTMLElement).dataset.id ?? null;
         event.preventDefault();
         touchClone = row.cloneNode(true) as HTMLElement;
         touchClone.style.cssText = `left:0;opacity:0.7;pointer-events:none;position:fixed;top:0;width:${row.offsetWidth}px;z-index:1000;`;
         document.body.appendChild(touchClone);
         const touch = event.touches[0];
-        touchClone.style.left = touch.clientX - row.offsetWidth / 2 + 'px';
-        touchClone.style.top = touch.clientY - row.offsetHeight / 2 + 'px';
+        touchClone.style.left = `${touch.clientX - row.offsetWidth / 2}px`;
+        touchClone.style.top = `${touch.clientY - row.offsetHeight / 2}px`;
       },
-      { passive: false }
+      { passive: false },
     );
 
     container.addEventListener(
@@ -239,8 +241,8 @@ const EditApp = (() => {
         if (!touchDragSrcId || !touchClone) return;
         event.preventDefault();
         const touch = event.touches[0];
-        touchClone.style.left = touch.clientX - touchClone.offsetWidth / 2 + 'px';
-        touchClone.style.top = touch.clientY - touchClone.offsetHeight / 2 + 'px';
+        touchClone.style.left = `${touch.clientX - touchClone.offsetWidth / 2}px`;
+        touchClone.style.top = `${touch.clientY - touchClone.offsetHeight / 2}px`;
         document.querySelectorAll('.setup-item-row.drag-over').forEach((el) => {
           el.classList.remove('drag-over');
         });
@@ -248,7 +250,7 @@ const EditApp = (() => {
         const row = el ? el.closest('.setup-item-row') : null;
         if (row && (row as HTMLElement).dataset.id !== touchDragSrcId) row.classList.add('drag-over');
       },
-      { passive: false }
+      { passive: false },
     );
 
     container.addEventListener('touchend', (e: Event) => {
@@ -263,9 +265,10 @@ const EditApp = (() => {
       });
       const touch = event.changedTouches[0];
       const el = document.elementFromPoint(touch.clientX, touch.clientY);
-      const row = el ? el.closest('.setup-item-row') : null;
-      if (row && (row as HTMLElement).dataset.id !== touchDragSrcId) {
-        onDropReorder(touchDragSrcId, (row as HTMLElement).dataset.id);
+      const row = el ? el.closest<HTMLElement>('.setup-item-row') : null;
+      const dropId = row ? row.dataset.id : undefined;
+      if (dropId && dropId !== touchDragSrcId) {
+        onDropReorder(touchDragSrcId, dropId);
       }
       touchDragSrcId = null;
     });

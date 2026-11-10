@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test('create flow enables start and navigates to cashier', async ({ page }) => {
   await page.goto('/create/');
@@ -17,4 +17,3 @@ test('create flow enables start and navigates to cashier', async ({ page }) => {
   await expect(page).toHaveURL(/\/$/);
   await expect(page.locator('#cashier-event-name')).toContainText('Vereinsfest');
 });
-

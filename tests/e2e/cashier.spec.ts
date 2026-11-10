@@ -1,11 +1,14 @@
-import { test, expect } from '@playwright/test';
-import { STORAGE_KEY, buildSeedState } from './utils';
+import { expect, test } from '@playwright/test';
+import { buildSeedState, STORAGE_KEY } from './utils';
 
 test('cashier renders items and updates totals', async ({ page }) => {
   const { state } = buildSeedState();
-  await page.addInitScript(([key, value]) => {
-    localStorage.setItem(key, value);
-  }, [STORAGE_KEY, JSON.stringify(state)]);
+  await page.addInitScript(
+    ([key, value]) => {
+      localStorage.setItem(key, value);
+    },
+    [STORAGE_KEY, JSON.stringify(state)],
+  );
 
   await page.goto('/');
 
@@ -15,4 +18,3 @@ test('cashier renders items and updates totals', async ({ page }) => {
   await tiles.first().click();
   await expect(page.locator('#tx-total')).toContainText('1,50');
 });
-
