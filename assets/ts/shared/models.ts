@@ -147,6 +147,16 @@ function calculateItemsSold(event: Event): Record<string, ItemSoldInfo> {
   return sold;
 }
 
+function moveItem(items: Item[], srcId: string, dstId: string): Item[] {
+  const srcIdx = items.findIndex((i) => i.id === srcId);
+  const dstIdx = items.findIndex((i) => i.id === dstId);
+  if (srcIdx < 0 || dstIdx < 0 || srcIdx === dstIdx) return items;
+  const result = items.slice();
+  const [moved] = result.splice(srcIdx, 1);
+  result.splice(dstIdx, 0, moved);
+  return result;
+}
+
 export const Models = {
   generateId,
   createEvent,
@@ -158,6 +168,7 @@ export const Models = {
   buildItemsMap,
   calculateEventTotals,
   calculateItemsSold,
+  moveItem,
 };
 
 export type { Event, EventTotals, Item, ItemSoldInfo, Transaction };

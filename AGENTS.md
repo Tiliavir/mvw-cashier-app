@@ -22,7 +22,7 @@ The app is a **Multi-Page Application (MPA)** built with [Hugo](https://gohugo.i
 
 - **`assets/ts/shared/models.ts`** — Pure model factories and calculation functions. Exports `Models` namespace.
 - **`assets/ts/shared/storage.ts`** — localStorage read/write, event/item/transaction operations. Exports `Storage` namespace.
-- **`assets/ts/shared/ui.ts`** — Shared UI helpers: rendering, formatting. Exports `UI` namespace.
+- **`assets/ts/shared/ui.ts`** — Shared UI helpers: rendering, formatting, drag-and-drop for the item list shared by create and edit (`bindSetupItemsDragDrop`; each page passes its own reorder callback). Exports `UI` namespace.
 - **`assets/ts/shared/index.ts`** — Re-exports all shared modules.
 
 Each page app (e.g. `assets/ts/app.ts`, `assets/ts/create/create-app.ts`) imports from `./shared/index`.
@@ -190,7 +190,7 @@ npm run compile && npx playwright test tests/e2e/cashier.spec.ts -g "test name"
 - `biome.json` - Biome lint + format for TS/JS/JSON (`npm run format` applies fixes)
 - `.stylelintrc` - Stylelint for SCSS
 - `playwright.config.ts` - Playwright config
-- `hugo.toml` - Hugo config with asset pipeline settings
+- `hugo.toml` - Hugo config with asset pipeline settings (SCSS via Dart Sass: the standalone `sass` binary must be on `PATH`)
 
 ## Key Conventions
 

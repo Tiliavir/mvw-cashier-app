@@ -234,12 +234,123 @@ function escapeAttr(str: string): string {
     .replace(/>/g, '&gt;');
 }
 
+// ─── Setup item drag-and-drop ────────────────────────────────────────
+function bindSetupItemsDragDrop(container: HTMLElement, onReorder: (srcId: string, dstId: string) => void): void {
+  let dragSrcId: string | null = null;
+  let touchDragSrcId: string | null = null;
+  let touchClone: HTMLElement | null = null;
+
+  // Desktop drag-and-drop
+  container.addEventListener('dragstart', (event) => {
+    const row = (event.target as HTMLElement).closest('.setup-item-row');
+    if (!row) return;
+    dragSrcId = (row as HTMLElement).dataset.id ?? null;
+    if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
+    row.classList.add('dragging');
+  });
+
+  container.addEventListener('dragend', (event) => {
+    const row = (event.target as HTMLElement).closest('.setup-item-row');
+    if (row) row.classList.remove('dragging');
+    document.querySelectorAll('.setup-item-row.drag-over').forEach((el) => {
+      el.classList.remove('drag-over');
+    });
+    dragSrcId = null;
+  });
+
+  container.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+    const row = (event.target as HTMLElement).closest('.setup-item-row');
+    if (!row || (row as HTMLElement).dataset.id === dragSrcId) return;
+    document.querySelectorAll('.setup-item-row.drag-over').forEach((el) => {
+      el.classList.remove('drag-over');
+    });
+    row.classList.add('drag-over');
+  });
+
+  container.addEventListener('dragleave', (event) => {
+    const row = (event.target as HTMLElement).closest('.setup-item-row');
+    if (row) row.classList.remove('drag-over');
+  });
+
+  container.addEventListener('drop', (event) => {
+    event.preventDefault();
+    const row = (event.target as HTMLElement).closest('.setup-item-row');
+    if (!row) return;
+    row.classList.remove('drag-over');
+    const dropId = (row as HTMLElement).dataset.id;
+    if (dragSrcId && dropId && dragSrcId !== dropId) {
+      onReorder(dragSrcId, dropId);
+    }
+    dragSrcId = null;
+  });
+
+  // Touch drag-and-drop
+  container.addEventListener(
+    'touchstart',
+    (event) => {
+      const handle = (event.target as HTMLElement).closest('.drag-handle');
+      if (!handle) return;
+      const row = handle.closest<HTMLElement>('.setup-item-row');
+      if (!row) return;
+      touchDragSrcId = row.dataset.id ?? null;
+      event.preventDefault();
+      touchClone = row.cloneNode(true) as HTMLElement;
+      touchClone.style.cssText = `left:0;opacity:0.7;pointer-events:none;position:fixed;top:0;width:${row.offsetWidth}px;z-index:1000;`;
+      document.body.appendChild(touchClone);
+      const touch = event.touches[0];
+      touchClone.style.left = `${touch.clientX - row.offsetWidth / 2}px`;
+      touchClone.style.top = `${touch.clientY - row.offsetHeight / 2}px`;
+    },
+    { passive: false },
+  );
+
+  container.addEventListener(
+    'touchmove',
+    (event) => {
+      if (!touchDragSrcId || !touchClone) return;
+      event.preventDefault();
+      const touch = event.touches[0];
+      touchClone.style.left = `${touch.clientX - touchClone.offsetWidth / 2}px`;
+      touchClone.style.top = `${touch.clientY - touchClone.offsetHeight / 2}px`;
+      document.querySelectorAll('.setup-item-row.drag-over').forEach((el) => {
+        el.classList.remove('drag-over');
+      });
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      const row = el ? el.closest('.setup-item-row') : null;
+      if (row && (row as HTMLElement).dataset.id !== touchDragSrcId) row.classList.add('drag-over');
+    },
+    { passive: false },
+  );
+
+  container.addEventListener('touchend', (event) => {
+    if (!touchDragSrcId) return;
+    if (touchClone) {
+      touchClone.remove();
+      touchClone = null;
+    }
+    document.querySelectorAll('.setup-item-row.drag-over').forEach((el) => {
+      el.classList.remove('drag-over');
+    });
+    const touch = event.changedTouches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const row = el ? el.closest<HTMLElement>('.setup-item-row') : null;
+    const dropId = row ? row.dataset.id : undefined;
+    if (dropId && dropId !== touchDragSrcId) {
+      onReorder(touchDragSrcId, dropId);
+    }
+    touchDragSrcId = null;
+  });
+}
+
 export const UI = {
   formatCurrency,
   formatDate,
   showScreen,
   renderSetupScreen,
   renderSetupItems,
+  bindSetupItemsDragDrop,
   renderCashierScreen,
   renderItemGrid,
   renderTransactionBar,

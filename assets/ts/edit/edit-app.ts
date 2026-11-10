@@ -5,9 +5,6 @@ const EditApp = (() => {
   let state = Storage.loadState();
   let eventId: string | null = null;
   let editingItemId: string | null = null;
-  let dragSrcId: string | null = null;
-  let touchDragSrcId: string | null = null;
-  let touchClone: HTMLElement | null = null;
 
   function init(): void {
     eventId = new URLSearchParams(location.search).get('id');
@@ -42,14 +39,10 @@ const EditApp = (() => {
 
   function onDropReorder(srcId: string, dstId: string): void {
     const event = currentEvent();
-    if (!event || !srcId || srcId === dstId) return;
-    const items = event.items.slice();
-    const srcIdx = items.findIndex((i) => i.id === srcId);
-    const dstIdx = items.findIndex((i) => i.id === dstId);
-    if (srcIdx < 0 || dstIdx < 0) return;
-    const [moved] = items.splice(srcIdx, 1);
-    items.splice(dstIdx, 0, moved);
-    if (eventId) state = Storage.reorderItemsInEvent(state, eventId, items);
+    if (!event || !eventId) return;
+    const items = Models.moveItem(event.items, srcId, dstId);
+    if (items === event.items) return;
+    state = Storage.reorderItemsInEvent(state, eventId, items);
     renderItems();
   }
 
@@ -159,119 +152,8 @@ const EditApp = (() => {
         renderItems();
       });
 
-      setupDragDrop(container);
+      UI.bindSetupItemsDragDrop(container, onDropReorder);
     }
-  }
-
-  function setupDragDrop(container: HTMLElement): void {
-    container.addEventListener('dragstart', (e: Event) => {
-      const event = e as DragEvent;
-      const row = (event.target as HTMLElement).closest('.setup-item-row');
-      if (!row) return;
-      dragSrcId = (row as HTMLElement).dataset.id ?? null;
-      if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
-      row.classList.add('dragging');
-    });
-
-    container.addEventListener('dragend', (e: Event) => {
-      const event = e as DragEvent;
-      const row = (event.target as HTMLElement).closest('.setup-item-row');
-      if (row) row.classList.remove('dragging');
-      document.querySelectorAll('.setup-item-row.drag-over').forEach((el) => {
-        el.classList.remove('drag-over');
-      });
-      dragSrcId = null;
-    });
-
-    container.addEventListener('dragover', (e: Event) => {
-      const event = e as DragEvent;
-      event.preventDefault();
-      if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
-      const row = (event.target as HTMLElement).closest('.setup-item-row');
-      if (!row || (row as HTMLElement).dataset.id === dragSrcId) return;
-      document.querySelectorAll('.setup-item-row.drag-over').forEach((el) => {
-        el.classList.remove('drag-over');
-      });
-      row.classList.add('drag-over');
-    });
-
-    container.addEventListener('dragleave', (e: Event) => {
-      const event = e as DragEvent;
-      const row = (event.target as HTMLElement).closest('.setup-item-row');
-      if (row) row.classList.remove('drag-over');
-    });
-
-    container.addEventListener('drop', (e: Event) => {
-      const event = e as DragEvent;
-      event.preventDefault();
-      const row = (event.target as HTMLElement).closest('.setup-item-row');
-      if (!row) return;
-      row.classList.remove('drag-over');
-      const dropId = (row as HTMLElement).dataset.id;
-      if (dragSrcId && dropId && dragSrcId !== dropId) {
-        onDropReorder(dragSrcId, dropId);
-      }
-      dragSrcId = null;
-    });
-
-    container.addEventListener(
-      'touchstart',
-      (e: Event) => {
-        const event = e as TouchEvent;
-        const handle = (event.target as HTMLElement).closest('.drag-handle');
-        if (!handle) return;
-        const row = handle.closest<HTMLElement>('.setup-item-row');
-        if (!row) return;
-        touchDragSrcId = (row as HTMLElement).dataset.id ?? null;
-        event.preventDefault();
-        touchClone = row.cloneNode(true) as HTMLElement;
-        touchClone.style.cssText = `left:0;opacity:0.7;pointer-events:none;position:fixed;top:0;width:${row.offsetWidth}px;z-index:1000;`;
-        document.body.appendChild(touchClone);
-        const touch = event.touches[0];
-        touchClone.style.left = `${touch.clientX - row.offsetWidth / 2}px`;
-        touchClone.style.top = `${touch.clientY - row.offsetHeight / 2}px`;
-      },
-      { passive: false },
-    );
-
-    container.addEventListener(
-      'touchmove',
-      (e: Event) => {
-        const event = e as TouchEvent;
-        if (!touchDragSrcId || !touchClone) return;
-        event.preventDefault();
-        const touch = event.touches[0];
-        touchClone.style.left = `${touch.clientX - touchClone.offsetWidth / 2}px`;
-        touchClone.style.top = `${touch.clientY - touchClone.offsetHeight / 2}px`;
-        document.querySelectorAll('.setup-item-row.drag-over').forEach((el) => {
-          el.classList.remove('drag-over');
-        });
-        const el = document.elementFromPoint(touch.clientX, touch.clientY);
-        const row = el ? el.closest('.setup-item-row') : null;
-        if (row && (row as HTMLElement).dataset.id !== touchDragSrcId) row.classList.add('drag-over');
-      },
-      { passive: false },
-    );
-
-    container.addEventListener('touchend', (e: Event) => {
-      const event = e as TouchEvent;
-      if (!touchDragSrcId) return;
-      if (touchClone) {
-        touchClone.remove();
-        touchClone = null;
-      }
-      document.querySelectorAll('.setup-item-row.drag-over').forEach((el) => {
-        el.classList.remove('drag-over');
-      });
-      const touch = event.changedTouches[0];
-      const el = document.elementFromPoint(touch.clientX, touch.clientY);
-      const row = el ? el.closest<HTMLElement>('.setup-item-row') : null;
-      const dropId = row ? row.dataset.id : undefined;
-      if (dropId && dropId !== touchDragSrcId) {
-        onDropReorder(touchDragSrcId, dropId);
-      }
-      touchDragSrcId = null;
-    });
   }
 
   function on(id: string, event: string, handler: EventListener): void {
