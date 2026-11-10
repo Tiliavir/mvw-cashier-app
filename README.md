@@ -22,8 +22,9 @@ A lightweight, browser-based cashier app for club events ("Vereinsfeste"). Built
 
 ### Prerequisites
 
-- [Hugo](https://gohugo.io/installation/) (extended edition recommended)
-- [Node.js](https://nodejs.org/) ≥ 20
+- [Hugo](https://gohugo.io/installation/) ≥ 0.169
+- [Dart Sass](https://sass-lang.com/install/) — the standalone `sass` binary on your `PATH` (e.g. `brew install sass/sass/sass`); the npm `sass` package does not work with Hugo
+- [Node.js](https://nodejs.org/) ≥ 24
 
 ### Install dependencies
 
@@ -116,7 +117,7 @@ hugo server            # serves at http://localhost:1313/
 ## Build Pipeline
 
 ```
-assets/scss/style.scss  ──(Hugo toCSS)─────► static/css/app.css  ─┐
+assets/scss/style.scss  ──(Dart Sass)──────► static/css/app.css  ─┐
 assets/ts/**/*.ts      ──(Hugo asset pipeline)──► static/js/      ├─► Hugo ──► public/
 content/ + layouts/    ────────────────────────────────────────────┘
 ```
@@ -144,10 +145,9 @@ git push origin v1.0.0
 
 The `release.yml` workflow:
 1. Creates a GitHub Release with auto-generated release notes
-2. Installs Hugo + Node.js dependencies
-3. Compiles CSS/JS assets (`npm run build:assets`)
-4. Runs `hugo --baseURL "$base_url/"` using the GitHub Pages base URL
-5. Uploads and deploys `public/` to GitHub Pages
+2. Installs Hugo, Dart Sass and Node.js dependencies
+3. Runs `hugo --baseURL "$base_url/"` using the GitHub Pages base URL
+4. Uploads and deploys `public/` to GitHub Pages
 
 The Hugo `<base href>` approach handles subdirectory deployments (e.g. `https://username.github.io/mvw-cashier-app/`) correctly — no sed-based HTML patching needed.
 
