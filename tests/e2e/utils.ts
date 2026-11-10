@@ -43,9 +43,7 @@ export function buildClosedEventSeed() {
           id: eventId,
           name: 'Sommerfest',
           createdAt: now,
-          items: [
-            { id: 'item-1', name: 'Kuchen', price: 2.5, color: '#d7ccc8' },
-          ],
+          items: [{ id: 'item-1', name: 'Kuchen', price: 2.5, color: '#d7ccc8' }],
           transactions: [
             {
               timestamp: now,
@@ -62,4 +60,3 @@ export function buildClosedEventSeed() {
     },
   };
 }
-

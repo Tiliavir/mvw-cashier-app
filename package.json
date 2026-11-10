@@ -10,25 +10,20 @@
   },
   "scripts": {
     "compile": "hugo --cleanDestinationDir --minify",
-    "lint": "stylelint assets/scss/style.scss && eslint .",
+    "lint": "stylelint assets/scss/style.scss && biome ci . && tsc --noEmit",
     "validate": "npx vnu --skip-non-html --filterpattern '.*view-transition.*|.*CSS: Parse Error.*' public/**/*.html",
     "test": "npm run compile && node tests/scripts/run-playwright.js",
     "build": "npm run compile && npm run lint && npm run validate && npm run test",
-    "dev": "hugo serve --baseURL http://localhost:1313/"
+    "dev": "hugo serve --baseURL http://localhost:1313/",
+    "format": "biome check --write ."
   },
   "devDependencies": {
-    "@eslint/js": "10.0.1",
-    "@playwright/test": "^1.64.1",
-    "@typescript-eslint/eslint-plugin": "^8.72.1",
-    "@typescript-eslint/parser": "^8.71.2",
+    "@biomejs/biome": "2.6.6",
+    "@playwright/test": "^1.65.0",
     "@types/node": "^26.6.6",
-    "eslint": "10.14.0",
-    "globals": "17.14.0",
-    "sass": "^1.107.1",
     "stylelint": "17.16.0",
-    "stylelint-config-standard": "40.0.0",
     "stylelint-config-standard-scss": "^17.0.0",
-    "typescript": "^6.0.3",
-    "vnu-jar": "26.11.4"
+    "typescript": "^7.0.2",
+    "vnu-jar": "26.11.9"
   }
 }

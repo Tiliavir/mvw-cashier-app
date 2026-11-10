@@ -1,5 +1,5 @@
 baseURL = '/'
-languageCode = 'de'
+locale = 'de'
 title = 'MVW Kassierer'
 enableRobotsTXT = true
 disableKinds = ['taxonomy', 'term', 'RSS']

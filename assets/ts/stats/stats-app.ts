@@ -1,5 +1,5 @@
-import { Models, Storage, UI } from '../shared/index';
 import type { Event, ItemSoldInfo, Transaction } from '../shared/index';
+import { Models, Storage, UI } from '../shared/index';
 
 // ─── Stats Page ───────────────────────────────────────────────────────────────
 const StatsApp = (() => {
@@ -18,7 +18,7 @@ const StatsApp = (() => {
     if (contentEl) contentEl.hidden = false;
 
     const titleEl = document.getElementById('stats-event-name');
-    if (titleEl) titleEl.textContent = event.name + ' - ' + UI.formatDate(event.createdAt);
+    if (titleEl) titleEl.textContent = `${event.name} - ${UI.formatDate(event.createdAt)}`;
 
     renderStatCards(event);
     renderItemsTable(event);
@@ -26,7 +26,8 @@ const StatsApp = (() => {
 
     on('btn-back-settings', 'click', () => {
       sessionStorage.setItem('vt-direction', 'back');
-      location.href = (document.getElementById('btn-back-settings') as HTMLElement).dataset.href!;
+      const href = (document.getElementById('btn-back-settings') as HTMLElement).dataset.href;
+      if (href) location.href = href;
     });
   }
 
@@ -105,7 +106,7 @@ const StatsApp = (() => {
       const date = new Date(tx.timestamp);
       const key = date.toISOString().slice(0, 13);
       if (!hourMap[key]) {
-        hourMap[key] = { label: key.slice(11) + ':00', count: 0, amount: 0 };
+        hourMap[key] = { label: `${key.slice(11)}:00`, count: 0, amount: 0 };
       }
       hourMap[key].count += 1;
       hourMap[key].amount = Math.round((hourMap[key].amount + tx.total) * 100) / 100;
@@ -119,11 +120,7 @@ const StatsApp = (() => {
     drawLineChart(amountContainer, amountData, 'Umsatz pro Stunde');
   }
 
-  function drawLineChart(
-    container: HTMLElement,
-    data: { label: string; value: number }[],
-    ariaLabel: string
-  ): void {
+  function drawLineChart(container: HTMLElement, data: { label: string; value: number }[], ariaLabel: string): void {
     container.innerHTML = '';
 
     const NS = 'http://www.w3.org/2000/svg';
@@ -132,11 +129,14 @@ const StatsApp = (() => {
     const padding = { top: 16, right: 12, bottom: 36, left: 52 };
     const innerW = width - padding.left - padding.right;
     const innerH = height - padding.top - padding.bottom;
-    const maxVal = Math.max(1, data.reduce((m, d) => (d.value > m ? d.value : m), 0));
+    const maxVal = Math.max(
+      1,
+      data.reduce((m, d) => Math.max(d.value, m), 0),
+    );
     const xStep = data.length > 1 ? innerW / (data.length - 1) : 0;
 
     const svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
     svg.setAttribute('width', '100%');
     svg.setAttribute('role', 'img');
     svg.setAttribute('aria-label', ariaLabel);
@@ -161,7 +161,7 @@ const StatsApp = (() => {
 
     const yTickIntervals = 4;
     for (let t = 0; t <= yTickIntervals; t++) {
-      const tickVal = Math.round((maxVal * t / yTickIntervals) * 100) / 100;
+      const tickVal = Math.round(((maxVal * t) / yTickIntervals) * 100) / 100;
       const tickY = padding.top + innerH - (t / yTickIntervals) * innerH;
       const tickLabel = document.createElementNS(NS, 'text');
       tickLabel.setAttribute('x', String(padding.left - 6));
@@ -188,7 +188,7 @@ const StatsApp = (() => {
     data.forEach((d, i) => {
       const x = padding.left + xStep * i;
       const y = padding.top + innerH - (d.value / maxVal) * innerH;
-      points += x + ',' + y + ' ';
+      points += `${x},${y} `;
 
       const dot = document.createElementNS(NS, 'circle');
       dot.setAttribute('cx', String(x));
@@ -196,7 +196,7 @@ const StatsApp = (() => {
       dot.setAttribute('r', '3');
       dot.setAttribute('fill', '#3498db');
       const title = document.createElementNS(NS, 'title');
-      title.textContent = d.label + ': ' + d.value;
+      title.textContent = `${d.label}: ${d.value}`;
       dot.appendChild(title);
       svg.appendChild(dot);
 

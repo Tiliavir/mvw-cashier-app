@@ -23,7 +23,7 @@
   }());
 </script>
 {{- end }}
-{{- $cssOpts := dict "targetPath" "css/app.css" "outputStyle" "compressed" "enableSourceMap" false -}}
+{{- $cssOpts := dict "transpiler" "dartsass" "targetPath" "css/app.css" "outputStyle" "compressed" "enableSourceMap" false -}}
 {{- with resources.Get "scss/style.scss" | toCSS $cssOpts | minify -}}
   <style>{{ .Content | safeCSS }}</style>
 {{- end }}

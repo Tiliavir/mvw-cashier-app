@@ -13,13 +13,6 @@
     "declaration": false,
     "sourceMap": false
   },
-  "include": [
-    "assets/**/*.ts",
-    "tests/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "public"
-  ]
+  "include": ["assets/**/*.ts", "tests/**/*.ts"],
+  "exclude": ["node_modules", "public"]
 }
-

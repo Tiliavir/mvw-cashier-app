@@ -1,29 +1,26 @@
-import { Models, Storage, UI } from '../shared/index';
 import type { Item } from '../shared/index';
+import { Models, Storage, UI } from '../shared/index';
 
 // ─── Create Page ──────────────────────────────────────────────────────────────
 const CreateApp = (() => {
   let pendingItems: Item[] = [];
   let editingItemId: string | null = null;
-  let dragSrcId: string | null = null;
-  let touchDragSrcId: string | null = null;
-  let touchClone: HTMLElement | null = null;
 
   const EXAMPLE_ITEMS = [
-    { name: 'Softdrinks', price: 2.00, color: '#3498db' },
-    { name: 'Bier', price: 2.50, color: '#e67e22' },
-    { name: 'Wasser', price: 1.50, color: '#85c1e9' },
-    { name: 'Wein', price: 3.00, color: '#9b59b6' },
-    { name: 'Schorle', price: 2.00, color: '#27ae60' },
-    { name: 'Pfand+', price: 2.00, color: '#95a5a6' },
-    { name: 'Pfand-', price: -2.00, color: '#95a5a6' },
-    { name: 'Grillwurst', price: 3.50, color: '#e67e22' },
-    { name: 'Bratwurst', price: 3.00, color: '#d35400' },
-    { name: 'Pommes', price: 3.00, color: '#f1c40f' },
-    { name: 'Steak', price: 6.00, color: '#795548' },
-    { name: 'Kaffee', price: 2.00, color: '#4e342e' },
-    { name: 'Kuchen', price: 2.50, color: '#d7ccc8' },
-    { name: 'Torte', price: 3.00, color: '#f48fb1' },
+    { name: 'Softdrinks', price: 2.0, color: '#3498db' },
+    { name: 'Bier', price: 2.5, color: '#e67e22' },
+    { name: 'Wasser', price: 1.5, color: '#85c1e9' },
+    { name: 'Wein', price: 3.0, color: '#9b59b6' },
+    { name: 'Schorle', price: 2.0, color: '#27ae60' },
+    { name: 'Pfand+', price: 2.0, color: '#95a5a6' },
+    { name: 'Pfand-', price: -2.0, color: '#95a5a6' },
+    { name: 'Grillwurst', price: 3.5, color: '#e67e22' },
+    { name: 'Bratwurst', price: 3.0, color: '#d35400' },
+    { name: 'Pommes', price: 3.0, color: '#f1c40f' },
+    { name: 'Steak', price: 6.0, color: '#795548' },
+    { name: 'Kaffee', price: 2.0, color: '#4e342e' },
+    { name: 'Kuchen', price: 2.5, color: '#d7ccc8' },
+    { name: 'Torte', price: 3.0, color: '#f48fb1' },
   ];
 
   function init(): void {
@@ -39,16 +36,11 @@ const CreateApp = (() => {
   function updateStartButton(): void {
     const btn = document.getElementById('btn-start-event') as HTMLButtonElement;
     const checkbox = document.getElementById('accept-liability') as HTMLInputElement;
-    if (btn) btn.disabled = !(checkbox && checkbox.checked);
+    if (btn) btn.disabled = !checkbox?.checked;
   }
 
   function onDropReorder(srcId: string, dstId: string): void {
-    if (!srcId || srcId === dstId) return;
-    const srcIdx = pendingItems.findIndex((i: Item) => i.id === srcId);
-    const dstIdx = pendingItems.findIndex((i: Item) => i.id === dstId);
-    if (srcIdx < 0 || dstIdx < 0) return;
-    const [moved] = pendingItems.splice(srcIdx, 1);
-    pendingItems.splice(dstIdx, 0, moved);
+    pendingItems = Models.moveItem(pendingItems, srcId, dstId);
     renderItems();
   }
 
@@ -129,12 +121,12 @@ const CreateApp = (() => {
         if (target.closest('.btn-remove-item')) return;
         const row = target.closest('.setup-item-row');
         if (!row || row.classList.contains('setup-item-edit')) return;
-        editingItemId = (row as HTMLElement).dataset.id;
+        editingItemId = (row as HTMLElement).dataset.id ?? null;
         renderItems();
       });
 
       // Drag & drop handlers (desktop and touch)
-      setupDragDrop(container);
+      UI.bindSetupItemsDragDrop(container, onDropReorder);
     }
 
     on('btn-example-config', 'click', () => {
@@ -168,7 +160,11 @@ const CreateApp = (() => {
             const nameInput = document.getElementById('event-name') as HTMLInputElement;
             if (nameInput) nameInput.value = data.name;
             pendingItems = data.items.map((it: Record<string, unknown>) =>
-              Models.createItem(it.name as string || '', it.price as number || 0, it.color as string || '#cccccc')
+              Models.createItem(
+                (it.name as string) || '',
+                (it.price as number) || 0,
+                (it.color as string) || '#cccccc',
+              ),
             );
             editingItemId = null;
             renderItems();
@@ -194,7 +190,7 @@ const CreateApp = (() => {
         alert('Bitte mindestens einen Artikel hinzufügen.');
         return;
       }
-      if (!checkbox || !checkbox.checked) {
+      if (!checkbox?.checked) {
         alert('Bitte den Haftungsausschluss akzeptieren.');
         return;
       }
@@ -203,118 +199,6 @@ const CreateApp = (() => {
       event.items = pendingItems.slice();
       Storage.addEvent(currentState, event);
       location.href = document.baseURI;
-    });
-  }
-
-  function setupDragDrop(container: HTMLElement): void {
-    // Desktop drag-and-drop
-    container.addEventListener('dragstart', (e: Event) => {
-      const event = e as DragEvent;
-      const row = (event.target as HTMLElement).closest('.setup-item-row');
-      if (!row) return;
-      dragSrcId = (row as HTMLElement).dataset.id;
-      if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
-      row.classList.add('dragging');
-    });
-
-    container.addEventListener('dragend', (e: Event) => {
-      const event = e as DragEvent;
-      const row = (event.target as HTMLElement).closest('.setup-item-row');
-      if (row) row.classList.remove('dragging');
-      document.querySelectorAll('.setup-item-row.drag-over').forEach((el) => {
-        el.classList.remove('drag-over');
-      });
-      dragSrcId = null;
-    });
-
-    container.addEventListener('dragover', (e: Event) => {
-      const event = e as DragEvent;
-      event.preventDefault();
-      if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
-      const row = (event.target as HTMLElement).closest('.setup-item-row');
-      if (!row || (row as HTMLElement).dataset.id === dragSrcId) return;
-      document.querySelectorAll('.setup-item-row.drag-over').forEach((el) => {
-        el.classList.remove('drag-over');
-      });
-      row.classList.add('drag-over');
-    });
-
-    container.addEventListener('dragleave', (e: Event) => {
-      const event = e as DragEvent;
-      const row = (event.target as HTMLElement).closest('.setup-item-row');
-      if (row) row.classList.remove('drag-over');
-    });
-
-    container.addEventListener('drop', (e: Event) => {
-      const event = e as DragEvent;
-      event.preventDefault();
-      const row = (event.target as HTMLElement).closest('.setup-item-row');
-      if (!row) return;
-      row.classList.remove('drag-over');
-      const dropId = (row as HTMLElement).dataset.id;
-      if (dragSrcId && dragSrcId !== dropId) {
-        onDropReorder(dragSrcId, dropId);
-      }
-      dragSrcId = null;
-    });
-
-    // Touch drag-and-drop
-    container.addEventListener(
-      'touchstart',
-      (e: Event) => {
-        const event = e as TouchEvent;
-        const handle = (event.target as HTMLElement).closest('.drag-handle');
-        if (!handle) return;
-        const row = handle.closest('.setup-item-row');
-        if (!row) return;
-        touchDragSrcId = (row as HTMLElement).dataset.id;
-        event.preventDefault();
-        touchClone = row.cloneNode(true) as HTMLElement;
-        touchClone.style.cssText = `left:0;opacity:0.7;pointer-events:none;position:fixed;top:0;width:${row.offsetWidth}px;z-index:1000;`;
-        document.body.appendChild(touchClone);
-        const touch = event.touches[0];
-        touchClone.style.left = (touch.clientX - row.offsetWidth / 2) + 'px';
-        touchClone.style.top = (touch.clientY - row.offsetHeight / 2) + 'px';
-      },
-      { passive: false }
-    );
-
-    container.addEventListener(
-      'touchmove',
-      (e: Event) => {
-        const event = e as TouchEvent;
-        if (!touchDragSrcId || !touchClone) return;
-        event.preventDefault();
-        const touch = event.touches[0];
-        touchClone.style.left = (touch.clientX - touchClone.offsetWidth / 2) + 'px';
-        touchClone.style.top = (touch.clientY - touchClone.offsetHeight / 2) + 'px';
-        document.querySelectorAll('.setup-item-row.drag-over').forEach((el) => {
-          el.classList.remove('drag-over');
-        });
-        const el = document.elementFromPoint(touch.clientX, touch.clientY);
-        const row = el ? el.closest('.setup-item-row') : null;
-        if (row && (row as HTMLElement).dataset.id !== touchDragSrcId) row.classList.add('drag-over');
-      },
-      { passive: false }
-    );
-
-    container.addEventListener('touchend', (e: Event) => {
-      const event = e as TouchEvent;
-      if (!touchDragSrcId) return;
-      if (touchClone) {
-        touchClone.remove();
-        touchClone = null;
-      }
-      document.querySelectorAll('.setup-item-row.drag-over').forEach((el) => {
-        el.classList.remove('drag-over');
-      });
-      const touch = event.changedTouches[0];
-      const el = document.elementFromPoint(touch.clientX, touch.clientY);
-      const row = el ? el.closest('.setup-item-row') : null;
-      if (row && (row as HTMLElement).dataset.id !== touchDragSrcId) {
-        onDropReorder(touchDragSrcId, (row as HTMLElement).dataset.id);
-      }
-      touchDragSrcId = null;
     });
   }
 
@@ -329,4 +213,3 @@ const CreateApp = (() => {
 document.addEventListener('DOMContentLoaded', () => {
   CreateApp.init();
 });
-

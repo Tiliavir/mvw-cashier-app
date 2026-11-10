@@ -29,7 +29,7 @@ const App = (() => {
     const total = Models.calculateTotal(cart, itemsMap);
     const receivedInput = document.getElementById('tx-received') as HTMLInputElement;
     const received = receivedInput ? Models.safeParseFloat(receivedInput.value) : 0;
-    const safeReceived = received < 0 ? 0 : received;
+    const safeReceived = Math.max(received, 0);
     // Show negative change when underpaid; keep 0 when no amount entered yet
     const displayChange = safeReceived > 0 ? Math.round((safeReceived - total) * 100) / 100 : 0;
     UI.renderTransactionBar(total, safeReceived, displayChange);
@@ -94,7 +94,7 @@ const App = (() => {
       const total = Models.calculateTotal(cart, itemsMap);
       const receivedInput = document.getElementById('tx-received') as HTMLInputElement;
       const received = receivedInput ? Models.safeParseFloat(receivedInput.value) : 0;
-      const safeReceived = received < 0 ? 0 : received;
+      const safeReceived = Math.max(received, 0);
 
       const change = Models.calculateChange(total, safeReceived);
 
@@ -117,7 +117,8 @@ const App = (() => {
 
     // Settings navigation
     on('btn-settings', 'click', () => {
-      location.href = (document.getElementById('btn-settings') as HTMLElement).dataset.href!;
+      const href = (document.getElementById('btn-settings') as HTMLElement).dataset.href;
+      if (href) location.href = href;
     });
   }
 
@@ -134,4 +135,3 @@ const App = (() => {
 document.addEventListener('DOMContentLoaded', () => {
   App.init();
 });
-

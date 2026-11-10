@@ -4,7 +4,7 @@ function generateId(): string {
     return crypto.randomUUID();
   }
   // Fallback for environments without crypto.randomUUID
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
     const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
@@ -62,7 +62,7 @@ function createTransaction(
   items: { itemId: string; quantity: number }[],
   total: number,
   received: number,
-  change: number
+  change: number,
 ): Transaction {
   return {
     timestamp: new Date().toISOString(),
@@ -76,7 +76,7 @@ function createTransaction(
 // ─── Pure calculation functions ───────────────────────────────────────
 function safeParseFloat(value: string | number): number {
   const parsed = parseFloat(String(value));
-  return isNaN(parsed) ? 0 : parsed;
+  return Number.isNaN(parsed) ? 0 : parsed;
 }
 
 function calculateTotal(cart: Record<string, number>, itemsMap: Record<string, Item>): number {
@@ -140,12 +140,21 @@ function calculateItemsSold(event: Event): Record<string, ItemSoldInfo> {
         sold[txItem.itemId] = { name: item.name, quantity: 0, revenue: 0 };
       }
       sold[txItem.itemId].quantity += txItem.quantity;
-      sold[txItem.itemId].revenue = Math.round(
-        (sold[txItem.itemId].revenue + item.price * txItem.quantity) * 100
-      ) / 100;
+      sold[txItem.itemId].revenue =
+        Math.round((sold[txItem.itemId].revenue + item.price * txItem.quantity) * 100) / 100;
     }
   }
   return sold;
+}
+
+function moveItem(items: Item[], srcId: string, dstId: string): Item[] {
+  const srcIdx = items.findIndex((i) => i.id === srcId);
+  const dstIdx = items.findIndex((i) => i.id === dstId);
+  if (srcIdx < 0 || dstIdx < 0 || srcIdx === dstIdx) return items;
+  const result = items.slice();
+  const [moved] = result.splice(srcIdx, 1);
+  result.splice(dstIdx, 0, moved);
+  return result;
 }
 
 export const Models = {
@@ -159,7 +168,7 @@ export const Models = {
   buildItemsMap,
   calculateEventTotals,
   calculateItemsSold,
+  moveItem,
 };
 
-export type { Event, Item, Transaction, EventTotals, ItemSoldInfo };
-
+export type { Event, EventTotals, Item, ItemSoldInfo, Transaction };
