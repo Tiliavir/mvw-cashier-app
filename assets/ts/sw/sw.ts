@@ -43,6 +43,6 @@ sw.addEventListener('fetch', (event) => {
     caches
       .open(CACHE_NAME)
       .then((cache) => cache.match(request, { ignoreSearch: true }))
-      .then((cached) => (cached !== undefined ? cached : fetch(request))),
+      .then((cached) => cached ?? fetch(request)),
   );
 });
