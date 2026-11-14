@@ -108,7 +108,7 @@ hugo server            # serves at http://localhost:1313/
     ├── dependabot.yml
     └── workflows/
         ├── ci.yml      # Build + lint + validate + test on every push/PR
-        └── release.yml # Tag v* → GitHub Release + GitHub Pages deploy
+        └── release.yml # New package.json version on main → Release + tag + Pages deploy
 ```
 
 > **Build artifacts are gitignored:** `static/css/`, `static/js/` (compiled TypeScript), and `public/` (Hugo output) are all generated — never committed.
@@ -137,18 +137,10 @@ content/ + layouts/    ───────────────────
 
 ## Deployment (GitHub Pages)
 
-Push a tag to trigger a release and automatic deploy:
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-The `release.yml` workflow:
-1. Creates a GitHub Release with auto-generated release notes
-2. Installs Hugo, Dart Sass and Node.js dependencies
-3. Runs `hugo --baseURL "$base_url/"` using the GitHub Pages base URL
-4. Uploads and deploys `public/` to GitHub Pages
+Releases are cut by CI: bump `version` in `package.json` (SemVer) and merge to `main`.
+The `release.yml` workflow sees a version without tag `vX.Y.Z`, runs the full check,
+creates the GitHub Release (and tag) and deploys `public/` to GitHub Pages.
+Never push tags by hand.
 
 The Hugo `<base href>` approach handles subdirectory deployments (e.g. `https://username.github.io/mvw-cashier-app/`) correctly — no sed-based HTML patching needed.
 
