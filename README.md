@@ -140,7 +140,7 @@ content/ + layouts/    ───────────────────
 Releases are cut by CI: bump `version` in `package.json` (SemVer) and merge to `main`.
 The `release.yml` workflow sees a version without tag `vX.Y.Z`, runs the full check,
 creates the GitHub Release (and tag) and deploys `public/` to GitHub Pages.
-Never push tags by hand.
+Never push tags by hand. To redeploy without a new version (e.g. after a failed deploy), run the Release workflow manually (Actions → Release → Run workflow).
 
 The Hugo `<base href>` approach handles subdirectory deployments (e.g. `https://username.github.io/mvw-cashier-app/`) correctly — no sed-based HTML patching needed.
 
