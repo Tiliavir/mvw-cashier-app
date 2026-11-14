@@ -76,53 +76,7 @@ const CreateApp = (() => {
 
     if (container) {
       container.addEventListener('click', (e: Event) => {
-        const target = e.target as HTMLElement;
-        const removeBtn = target.closest('.btn-remove-item');
-        if (removeBtn) {
-          pendingItems = pendingItems.filter((i: Item) => i.id !== (removeBtn as HTMLElement).dataset.id);
-          editingItemId = null;
-          renderItems();
-          return;
-        }
-
-        const saveBtn = target.closest('.btn-save-item');
-        if (saveBtn) {
-          const id = (saveBtn as HTMLElement).dataset.id;
-          const row = container.querySelector(`[data-id="${id}"]`);
-          if (!row) return;
-          const nameInput = row.querySelector('.edit-name') as HTMLInputElement;
-          const priceInput = row.querySelector('.edit-price') as HTMLInputElement;
-          const colorInput = row.querySelector('.edit-color') as HTMLInputElement;
-          const name = nameInput ? nameInput.value.trim() : '';
-          if (!name) {
-            alert('Bitte Artikelname eingeben.');
-            return;
-          }
-          const idx = pendingItems.findIndex((i: Item) => i.id === id);
-          if (idx >= 0) {
-            pendingItems[idx] = {
-              ...pendingItems[idx],
-              name,
-              price: Models.safeParseFloat(priceInput ? priceInput.value : '0'),
-              color: colorInput ? colorInput.value : '#cccccc',
-            };
-          }
-          editingItemId = null;
-          renderItems();
-          return;
-        }
-
-        if (target.closest('.btn-cancel-edit')) {
-          editingItemId = null;
-          renderItems();
-          return;
-        }
-
-        if (target.closest('.btn-remove-item')) return;
-        const row = target.closest('.setup-item-row');
-        if (!row || row.classList.contains('setup-item-edit')) return;
-        editingItemId = (row as HTMLElement).dataset.id ?? null;
-        renderItems();
+        handleItemsClick(container, e.target as HTMLElement);
       });
 
       // Drag & drop handlers (desktop and touch)
@@ -139,6 +93,73 @@ const CreateApp = (() => {
       renderItems();
     });
 
+    function handleItemsClick(container: HTMLElement, target: HTMLElement): void {
+      const removeBtn = target.closest<HTMLElement>('.btn-remove-item');
+      if (removeBtn) {
+        pendingItems = pendingItems.filter((i: Item) => i.id !== removeBtn.dataset.id);
+        stopEditing();
+        return;
+      }
+      const saveBtn = target.closest<HTMLElement>('.btn-save-item');
+      if (saveBtn) {
+        saveItem(container, saveBtn.dataset.id ?? '');
+        return;
+      }
+      if (target.closest('.btn-cancel-edit')) {
+        stopEditing();
+        return;
+      }
+      const row = target.closest<HTMLElement>('.setup-item-row');
+      if (row && !row.classList.contains('setup-item-edit')) {
+        editingItemId = row.dataset.id ?? null;
+        renderItems();
+      }
+    }
+
+    function saveItem(container: HTMLElement, id: string): void {
+      const values = UI.readItemEditRow(container, id);
+      if (!values) return;
+      if (!values.name) {
+        alert('Bitte Artikelname eingeben.');
+        return;
+      }
+      const idx = pendingItems.findIndex((i: Item) => i.id === id);
+      if (idx >= 0) {
+        pendingItems[idx] = {
+          ...pendingItems[idx],
+          name: values.name,
+          price: Models.safeParseFloat(values.price),
+          color: values.color,
+        };
+      }
+      stopEditing();
+    }
+
+    function stopEditing(): void {
+      editingItemId = null;
+      renderItems();
+    }
+
+    async function importFile(file: File): Promise<void> {
+      const errorEl = document.getElementById('import-error');
+      try {
+        const data = JSON.parse(await file.text());
+        if (!data || typeof data.name !== 'string' || !Array.isArray(data.items)) {
+          throw new Error('Ungültiges Format');
+        }
+        const nameInput = document.getElementById('event-name') as HTMLInputElement;
+        if (nameInput) nameInput.value = data.name;
+        pendingItems = data.items.map((it: Record<string, unknown>) =>
+          Models.createItem((it.name as string) || '', (it.price as number) || 0, (it.color as string) || '#cccccc'),
+        );
+        editingItemId = null;
+        renderItems();
+        if (errorEl) errorEl.textContent = '';
+      } catch {
+        if (errorEl) errorEl.textContent = 'Fehler beim Importieren: Ungültiges JSON-Format.';
+      }
+    }
+
     on('btn-import', 'click', () => {
       const fileInput = document.getElementById('import-file') as HTMLInputElement;
       if (fileInput) fileInput.click();
@@ -149,32 +170,9 @@ const CreateApp = (() => {
       fileInput.addEventListener('change', () => {
         const file = fileInput.files?.[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev: ProgressEvent<FileReader>) => {
-          const errorEl = document.getElementById('import-error');
-          try {
-            const data = JSON.parse(ev.target?.result as string);
-            if (!data || typeof data.name !== 'string' || !Array.isArray(data.items)) {
-              throw new Error('Ungültiges Format');
-            }
-            const nameInput = document.getElementById('event-name') as HTMLInputElement;
-            if (nameInput) nameInput.value = data.name;
-            pendingItems = data.items.map((it: Record<string, unknown>) =>
-              Models.createItem(
-                (it.name as string) || '',
-                (it.price as number) || 0,
-                (it.color as string) || '#cccccc',
-              ),
-            );
-            editingItemId = null;
-            renderItems();
-            if (errorEl) errorEl.textContent = '';
-          } catch {
-            if (errorEl) errorEl.textContent = 'Fehler beim Importieren: Ungültiges JSON-Format.';
-          }
+        void importFile(file).finally(() => {
           fileInput.value = '';
-        };
-        reader.readAsText(file);
+        });
       });
     }
 

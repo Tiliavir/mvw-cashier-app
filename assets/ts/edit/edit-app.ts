@@ -98,62 +98,61 @@ const EditApp = (() => {
 
     if (container) {
       container.addEventListener('click', (e: Event) => {
-        const event = currentEvent();
-        if (!event) return;
-        const target = e.target as HTMLElement;
-
-        const removeBtn = target.closest('.btn-remove-item');
-        if (removeBtn) {
-          const removeId = (removeBtn as HTMLElement).dataset.id;
-          if (eventId && removeId) state = Storage.removeItemFromEvent(state, eventId, removeId);
-          editingItemId = null;
-          renderItems();
-          return;
-        }
-
-        const saveBtn = target.closest('.btn-save-item');
-        if (saveBtn) {
-          const id = (saveBtn as HTMLElement).dataset.id;
-          const row = container.querySelector(`[data-id="${id}"]`);
-          if (!row) return;
-          const nameInput = row.querySelector('.edit-name') as HTMLInputElement;
-          const priceInput = row.querySelector('.edit-price') as HTMLInputElement;
-          const colorInput = row.querySelector('.edit-color') as HTMLInputElement;
-          const name = nameInput ? nameInput.value.trim() : '';
-          if (!name) {
-            alert('Bitte Artikelname eingeben.');
-            return;
-          }
-          const item = event.items.find((i) => i.id === id);
-          if (item && eventId) {
-            const updated = {
-              ...item,
-              name,
-              price: Models.safeParseFloat(priceInput ? priceInput.value : '0'),
-              color: colorInput ? colorInput.value : '#cccccc',
-            };
-            state = Storage.updateItemInEvent(state, eventId, updated);
-          }
-          editingItemId = null;
-          renderItems();
-          return;
-        }
-
-        if (target.closest('.btn-cancel-edit')) {
-          editingItemId = null;
-          renderItems();
-          return;
-        }
-
-        if (target.closest('.btn-remove-item')) return;
-        const row = target.closest('.setup-item-row');
-        if (!row || row.classList.contains('setup-item-edit')) return;
-        editingItemId = (row as HTMLElement).dataset.id ?? null;
-        renderItems();
+        handleItemsClick(container, e.target as HTMLElement);
       });
 
       UI.bindSetupItemsDragDrop(container, onDropReorder);
     }
+  }
+
+  function handleItemsClick(container: HTMLElement, target: HTMLElement): void {
+    if (!currentEvent()) return;
+    const removeBtn = target.closest<HTMLElement>('.btn-remove-item');
+    if (removeBtn) {
+      const removeId = removeBtn.dataset.id;
+      if (eventId && removeId) state = Storage.removeItemFromEvent(state, eventId, removeId);
+      stopEditing();
+      return;
+    }
+    const saveBtn = target.closest<HTMLElement>('.btn-save-item');
+    if (saveBtn) {
+      saveItem(container, saveBtn.dataset.id ?? '');
+      return;
+    }
+    if (target.closest('.btn-cancel-edit')) {
+      stopEditing();
+      return;
+    }
+    const row = target.closest<HTMLElement>('.setup-item-row');
+    if (row && !row.classList.contains('setup-item-edit')) {
+      editingItemId = row.dataset.id ?? null;
+      renderItems();
+    }
+  }
+
+  function saveItem(container: HTMLElement, id: string): void {
+    const values = UI.readItemEditRow(container, id);
+    if (!values) return;
+    if (!values.name) {
+      alert('Bitte Artikelname eingeben.');
+      return;
+    }
+    const item = currentEvent()?.items.find((i) => i.id === id);
+    if (item && eventId) {
+      const updated = {
+        ...item,
+        name: values.name,
+        price: Models.safeParseFloat(values.price),
+        color: values.color,
+      };
+      state = Storage.updateItemInEvent(state, eventId, updated);
+    }
+    stopEditing();
+  }
+
+  function stopEditing(): void {
+    editingItemId = null;
+    renderItems();
   }
 
   function on(id: string, event: string, handler: EventListener): void {

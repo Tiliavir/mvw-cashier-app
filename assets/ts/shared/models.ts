@@ -5,7 +5,7 @@ function generateId(): string {
   }
   // Fallback for environments without crypto.randomUUID
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
+    const r = Math.trunc(Math.random() * 16);
     const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
@@ -75,7 +75,7 @@ function createTransaction(
 
 // ─── Pure calculation functions ───────────────────────────────────────
 function safeParseFloat(value: string | number): number {
-  const parsed = parseFloat(String(value));
+  const parsed = Number.parseFloat(String(value));
   return Number.isNaN(parsed) ? 0 : parsed;
 }
 
