@@ -1,0 +1,4 @@
+{
+  "name": "Sommerfest",
+  "items": [{ "name": "Wurst", "price": 3.5, "color": "#ff0000" }]
+}

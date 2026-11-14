@@ -22,7 +22,8 @@ The app is a **Multi-Page Application (MPA)** built with [Hugo](https://gohugo.i
 
 - **`assets/ts/shared/models.ts`** — Pure model factories and calculation functions. Exports `Models` namespace.
 - **`assets/ts/shared/storage.ts`** — localStorage read/write, event/item/transaction operations. Exports `Storage` namespace.
-- **`assets/ts/shared/ui.ts`** — Shared UI helpers: rendering, formatting, drag-and-drop for the item list shared by create and edit (`bindSetupItemsDragDrop`; each page passes its own reorder callback). Exports `UI` namespace.
+- **`assets/ts/shared/ui.ts`** — Shared UI helpers: rendering, formatting, drag-and-drop for the setup item list (`bindSetupItemsDragDrop`). Exports `UI` namespace.
+- **`assets/ts/shared/item-editor.ts`** — The item list of the create and edit pages (add form, inline edit, remove, reorder). Each page passes an `ItemStore` (`getItems`/`setItems`): create keeps items in memory, edit writes them via `Storage.setEventItems`. Exports `ItemEditor` namespace.
 - **`assets/ts/shared/index.ts`** — Re-exports all shared modules.
 
 Each page app (e.g. `assets/ts/app.ts`, `assets/ts/create/create-app.ts`) imports from `./shared/index`.
@@ -115,6 +116,7 @@ npm run compile && npx playwright test tests/e2e/cashier.spec.ts -g "test name"
 │       ├── index.ts        # Re-exports all shared modules
 │       ├── models.ts       # Pure model factories + calculations
 │       ├── storage.ts      # localStorage read/write
+│       ├── item-editor.ts  # Item list of create + edit pages
 │       └── ui.ts           # DOM rendering helpers
 ├── assets/scss/            # SCSS source files
 │   └── style.scss

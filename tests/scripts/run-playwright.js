@@ -12,14 +12,20 @@ function getFreePort() {
   });
 }
 
-(async () => {
+async function main() {
   const port = process.env.PW_PORT ? Number(process.env.PW_PORT) : await getFreePort();
   const env = { ...process.env, PW_PORT: String(port) };
-  const child = spawn('npx', ['playwright', 'test'], {
+  const cli = require.resolve('@playwright/test/cli');
+  const child = spawn(process.execPath, [cli, 'test'], {
     stdio: 'inherit',
     env,
   });
   child.on('exit', (code) => {
     process.exit(code ?? 1);
   });
-})();
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

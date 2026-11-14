@@ -66,34 +66,10 @@ function updateEvent(state: AppState, updatedEvent: Event): AppState {
 }
 
 // ─── Item operations ──────────────────────────────────────────────────
-function addItemToEvent(state: AppState, eventId: string, item: Item): AppState {
+function setEventItems(state: AppState, eventId: string, items: Item[]): AppState {
   const event = state.events.find((e) => e.id === eventId);
   if (!event) return state;
-  const updatedEvent: Event = { ...event };
-  updatedEvent.items = [...event.items, item];
-  return updateEvent(state, updatedEvent);
-}
-
-function removeItemFromEvent(state: AppState, eventId: string, itemId: string): AppState {
-  const event = state.events.find((e) => e.id === eventId);
-  if (!event) return state;
-  const updatedEvent: Event = { ...event };
-  updatedEvent.items = event.items.filter((i) => i.id !== itemId);
-  return updateEvent(state, updatedEvent);
-}
-
-function updateItemInEvent(state: AppState, eventId: string, updatedItem: Item): AppState {
-  const event = state.events.find((e) => e.id === eventId);
-  if (!event) return state;
-  const updatedEvent: Event = { ...event };
-  updatedEvent.items = event.items.map((i) => (i.id === updatedItem.id ? updatedItem : i));
-  return updateEvent(state, updatedEvent);
-}
-
-function reorderItemsInEvent(state: AppState, eventId: string, reorderedItems: Item[]): AppState {
-  const event = state.events.find((e) => e.id === eventId);
-  if (!event) return state;
-  const updatedEvent: Event = { ...event, items: reorderedItems };
+  const updatedEvent: Event = { ...event, items };
   return updateEvent(state, updatedEvent);
 }
 
@@ -149,10 +125,7 @@ export const Storage = {
   setActiveEvent,
   getActiveEvent,
   updateEvent,
-  addItemToEvent,
-  removeItemFromEvent,
-  updateItemInEvent,
-  reorderItemsInEvent,
+  setEventItems,
   addTransaction,
   closeEvent,
   deleteEvent,

@@ -24,7 +24,7 @@ const StatsApp = (() => {
     renderItemsTable(event);
     renderCharts(event);
 
-    on('btn-back-settings', 'click', () => {
+    UI.on('btn-back-settings', 'click', () => {
       sessionStorage.setItem('vt-direction', 'back');
       const href = (document.getElementById('btn-back-settings') as HTMLElement).dataset.href;
       if (href) location.href = href;
@@ -112,7 +112,7 @@ const StatsApp = (() => {
       hourMap[key].amount = Math.round((hourMap[key].amount + tx.total) * 100) / 100;
     });
 
-    const keys = Object.keys(hourMap).sort();
+    const keys = Object.keys(hourMap).sort((a, b) => a.localeCompare(b));
     const countData = keys.map((key) => ({ label: hourMap[key].label, value: hourMap[key].count }));
     const amountData = keys.map((key) => ({ label: hourMap[key].label, value: hourMap[key].amount }));
 
@@ -220,11 +220,6 @@ const StatsApp = (() => {
     svg.insertBefore(polyline, svg.childNodes[2] || null);
 
     container.appendChild(svg);
-  }
-
-  function on(id: string, event: string, handler: EventListener): void {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener(event, handler);
   }
 
   return { init };

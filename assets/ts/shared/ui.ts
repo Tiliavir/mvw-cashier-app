@@ -1,5 +1,4 @@
 import type { Event, Item } from './models';
-import type { AppState } from './storage';
 
 // ─── Format helpers ──────────────────────────────────────────────────
 function formatCurrency(value: number): string {
@@ -150,69 +149,34 @@ function renderTransactionBar(total: number, _received: number, change: number):
   }
 }
 
-// ─── Settings Screen ─────────────────────────────────────────────────
-function renderSettingsScreen(
-  state: AppState,
-  calculateEventTotals: (event: Event) => { revenue: number; transactionCount: number },
-): void {
-  showScreen('screen-settings');
-
-  const activeEvent = state.events.find((e: Event) => e.id === state.activeEventId);
-
-  const nameEl = document.getElementById('settings-event-name');
-  const revenueEl = document.getElementById('settings-revenue');
-  const txCountEl = document.getElementById('settings-tx-count');
-  const closeBtn = document.getElementById('btn-close-event') as HTMLButtonElement;
-
-  if (activeEvent) {
-    const totals = calculateEventTotals(activeEvent);
-    if (nameEl) nameEl.textContent = activeEvent.name;
-    if (revenueEl) revenueEl.textContent = formatCurrency(totals.revenue);
-    if (txCountEl) txCountEl.textContent = String(totals.transactionCount);
-    if (closeBtn) closeBtn.disabled = false;
-  } else {
-    if (nameEl) nameEl.textContent = '—';
-    if (revenueEl) revenueEl.textContent = formatCurrency(0);
-    if (txCountEl) txCountEl.textContent = '0';
-    if (closeBtn) closeBtn.disabled = true;
-  }
-
-  renderPastEvents(state.events, calculateEventTotals);
+// ─── Setup item edit row ─────────────────────────────────────────────
+interface ItemEditValues {
+  name: string;
+  price: string;
+  color: string;
 }
 
-function renderPastEvents(
-  events: Event[],
-  calculateEventTotals: (event: Event) => { revenue: number; transactionCount: number },
-): void {
-  const container = document.getElementById('past-events-list');
-  if (!container) return;
-  container.innerHTML = '';
+function readItemEditRow(container: HTMLElement, id: string): ItemEditValues | null {
+  const row = container.querySelector(`[data-id="${id}"]`);
+  if (!row) return null;
+  const nameInput = row.querySelector('.edit-name') as HTMLInputElement | null;
+  const priceInput = row.querySelector('.edit-price') as HTMLInputElement | null;
+  const colorInput = row.querySelector('.edit-color') as HTMLInputElement | null;
+  return {
+    name: nameInput ? nameInput.value.trim() : '',
+    price: priceInput ? priceInput.value : '0',
+    color: colorInput ? colorInput.value : '#cccccc',
+  };
+}
 
-  const closed = events.filter((e: Event) => e.closed);
-  if (closed.length === 0) {
-    container.innerHTML = '<p class="empty-hint">Keine abgeschlossenen Veranstaltungen.</p>';
-    return;
-  }
+function on(id: string, event: string, handler: EventListener): void {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener(event, handler);
+}
 
-  closed.forEach((event: Event) => {
-    const totals = calculateEventTotals(event);
-    const row = document.createElement('div');
-    row.className = 'past-event-row';
-    row.innerHTML =
-      '<span class="past-event-name">' +
-      escapeHtml(event.name) +
-      '</span>' +
-      '<span class="past-event-date">' +
-      formatDate(event.createdAt) +
-      '</span>' +
-      '<span class="past-event-revenue">' +
-      formatCurrency(totals.revenue) +
-      '</span>' +
-      '<span class="past-event-tx">' +
-      totals.transactionCount +
-      ' Tx</span>';
-    container.appendChild(row);
-  });
+function setText(id: string, text: string): void {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
 }
 
 // ─── XSS helpers ─────────────────────────────────────────────────────
@@ -354,8 +318,9 @@ export const UI = {
   renderCashierScreen,
   renderItemGrid,
   renderTransactionBar,
-  renderSettingsScreen,
-  renderPastEvents,
+  readItemEditRow,
+  setText,
+  on,
   escapeHtml,
   escapeAttr,
 };

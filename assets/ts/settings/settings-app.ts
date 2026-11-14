@@ -13,23 +13,12 @@ const SettingsApp = (() => {
 
   function renderActiveEvent(): void {
     const active = Storage.getActiveEvent(state);
-    const nameEl = document.getElementById('settings-event-name');
-    const revenueEl = document.getElementById('settings-revenue');
-    const txCountEl = document.getElementById('settings-tx-count');
-    const closeBtn = document.getElementById('btn-close-event') as HTMLButtonElement;
-
-    if (active) {
-      const totals = Models.calculateEventTotals(active);
-      if (nameEl) nameEl.textContent = active.name;
-      if (revenueEl) revenueEl.textContent = UI.formatCurrency(totals.revenue);
-      if (txCountEl) txCountEl.textContent = String(totals.transactionCount);
-      if (closeBtn) closeBtn.disabled = false;
-    } else {
-      if (nameEl) nameEl.textContent = '—';
-      if (revenueEl) revenueEl.textContent = UI.formatCurrency(0);
-      if (txCountEl) txCountEl.textContent = '0';
-      if (closeBtn) closeBtn.disabled = true;
-    }
+    const totals = active ? Models.calculateEventTotals(active) : { revenue: 0, transactionCount: 0 };
+    UI.setText('settings-event-name', active ? active.name : '—');
+    UI.setText('settings-revenue', UI.formatCurrency(totals.revenue));
+    UI.setText('settings-tx-count', String(totals.transactionCount));
+    const closeBtn = document.getElementById('btn-close-event') as HTMLButtonElement | null;
+    if (closeBtn) closeBtn.disabled = !active;
   }
 
   function renderAllEvents(): void {
@@ -113,12 +102,12 @@ const SettingsApp = (() => {
   }
 
   function bindEvents(): void {
-    on('btn-back-cashier', 'click', () => {
+    UI.on('btn-back-cashier', 'click', () => {
       sessionStorage.setItem('vt-direction', 'back');
       location.href = document.baseURI;
     });
 
-    on('btn-close-event', 'click', () => {
+    UI.on('btn-close-event', 'click', () => {
       const active = Storage.getActiveEvent(state);
       if (!active) return;
       if (!confirm(`Veranstaltung "${active.name}" wirklich beenden?`)) return;
@@ -126,11 +115,6 @@ const SettingsApp = (() => {
       renderActiveEvent();
       renderAllEvents();
     });
-  }
-
-  function on(id: string, event: string, handler: EventListener): void {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener(event, handler);
   }
 
   return { init };
