@@ -1,0 +1,13 @@
+@use "sass:meta";
+
+// ─── Cascade layers ───────────────────────────────────────────────────────────
+// All app styles live in the `app` layer. Unlayered rules beat layered ones
+// regardless of specificity, so [hidden] wins over any `display` in the app
+// without !important.
+@layer app {
+  @include meta.load-css("app");
+}
+
+[hidden] {
+  display: none;
+}
