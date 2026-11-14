@@ -1,10 +1,10 @@
 import type { Item } from '../shared/index';
-import { Models, Storage, UI } from '../shared/index';
+import { ItemEditor, Models, Storage, UI } from '../shared/index';
 
 // ─── Create Page ──────────────────────────────────────────────────────────────
 const CreateApp = (() => {
   let pendingItems: Item[] = [];
-  let editingItemId: string | null = null;
+  let editor: ReturnType<typeof ItemEditor.bind> | null = null;
 
   const EXAMPLE_ITEMS = [
     { name: 'Softdrinks', price: 2.0, color: '#3498db' },
@@ -24,13 +24,20 @@ const CreateApp = (() => {
   ];
 
   function init(): void {
-    renderItems();
+    editor = ItemEditor.bind({
+      getItems: () => pendingItems,
+      setItems: (items) => {
+        pendingItems = items;
+      },
+    });
+    editor.render();
     bindEvents();
     updateStartButton();
   }
 
-  function renderItems(): void {
-    UI.renderSetupItems(pendingItems, editingItemId);
+  function replaceItems(items: Item[]): void {
+    pendingItems = items;
+    if (editor) editor.stopEditing();
   }
 
   function updateStartButton(): void {
@@ -39,61 +46,18 @@ const CreateApp = (() => {
     if (btn) btn.disabled = !checkbox?.checked;
   }
 
-  function onDropReorder(srcId: string, dstId: string): void {
-    pendingItems = Models.moveItem(pendingItems, srcId, dstId);
-    renderItems();
-  }
-
   function bindEvents(): void {
-    const container = document.getElementById('setup-items-list');
+    UI.on('accept-liability', 'change', updateStartButton);
 
-    on('accept-liability', 'change', updateStartButton);
-
-    on('btn-add-item', 'click', () => {
-      const nameInput = document.getElementById('item-name') as HTMLInputElement;
-      const priceInput = document.getElementById('item-price') as HTMLInputElement;
-      const colorInput = document.getElementById('item-color') as HTMLInputElement;
-      const name = nameInput ? nameInput.value.trim() : '';
-      const price = priceInput ? priceInput.value : '';
-      const color = colorInput ? colorInput.value.trim() : '#cccccc';
-      if (!name) {
-        alert('Bitte Artikelname eingeben.');
-        return;
-      }
-      if (price === '') {
-        alert('Bitte Preis eingeben.');
-        return;
-      }
-      const item = Models.createItem(name, price, color);
-      pendingItems.push(item);
-      editingItemId = null;
-      renderItems();
-      if (nameInput) nameInput.value = '';
-      if (priceInput) priceInput.value = '';
-      if (colorInput) colorInput.value = '#cccccc';
-      if (nameInput) nameInput.focus();
-    });
-
-    if (container) {
-      container.addEventListener('click', (e: Event) => {
-        handleItemsClick(container, e.target as HTMLElement);
-      });
-
-      // Drag & drop handlers (desktop and touch)
-      UI.bindSetupItemsDragDrop(container, onDropReorder);
-    }
-
-    on('btn-example-config', 'click', () => {
+    UI.on('btn-example-config', 'click', () => {
       const nameInput = document.getElementById('event-name') as HTMLInputElement;
       if (nameInput && !nameInput.value.trim()) {
         nameInput.value = 'Vereinsfest';
       }
-      pendingItems = EXAMPLE_ITEMS.map((cfg) => Models.createItem(cfg.name, cfg.price, cfg.color));
-      editingItemId = null;
-      renderItems();
+      replaceItems(EXAMPLE_ITEMS.map((cfg) => Models.createItem(cfg.name, cfg.price, cfg.color)));
     });
 
-    on('btn-import', 'click', () => {
+    UI.on('btn-import', 'click', () => {
       const fileInput = document.getElementById('import-file') as HTMLInputElement;
       if (fileInput) fileInput.click();
     });
@@ -109,7 +73,7 @@ const CreateApp = (() => {
       });
     }
 
-    on('btn-start-event', 'click', () => {
+    UI.on('btn-start-event', 'click', () => {
       const nameInput = document.getElementById('event-name') as HTMLInputElement;
       const name = nameInput ? nameInput.value.trim() : '';
       const checkbox = document.getElementById('accept-liability') as HTMLInputElement;
@@ -133,53 +97,6 @@ const CreateApp = (() => {
     });
   }
 
-  function handleItemsClick(container: HTMLElement, target: HTMLElement): void {
-    const removeBtn = target.closest<HTMLElement>('.btn-remove-item');
-    if (removeBtn) {
-      pendingItems = pendingItems.filter((i: Item) => i.id !== removeBtn.dataset.id);
-      stopEditing();
-      return;
-    }
-    const saveBtn = target.closest<HTMLElement>('.btn-save-item');
-    if (saveBtn) {
-      saveItem(container, saveBtn.dataset.id ?? '');
-      return;
-    }
-    if (target.closest('.btn-cancel-edit')) {
-      stopEditing();
-      return;
-    }
-    const row = target.closest<HTMLElement>('.setup-item-row');
-    if (row && !row.classList.contains('setup-item-edit')) {
-      editingItemId = row.dataset.id ?? null;
-      renderItems();
-    }
-  }
-
-  function saveItem(container: HTMLElement, id: string): void {
-    const values = UI.readItemEditRow(container, id);
-    if (!values) return;
-    if (!values.name) {
-      alert('Bitte Artikelname eingeben.');
-      return;
-    }
-    const idx = pendingItems.findIndex((i: Item) => i.id === id);
-    if (idx >= 0) {
-      pendingItems[idx] = {
-        ...pendingItems[idx],
-        name: values.name,
-        price: Models.safeParseFloat(values.price),
-        color: values.color,
-      };
-    }
-    stopEditing();
-  }
-
-  function stopEditing(): void {
-    editingItemId = null;
-    renderItems();
-  }
-
   async function importFile(file: File): Promise<void> {
     const errorEl = document.getElementById('import-error');
     try {
@@ -189,20 +106,15 @@ const CreateApp = (() => {
       }
       const nameInput = document.getElementById('event-name') as HTMLInputElement;
       if (nameInput) nameInput.value = data.name;
-      pendingItems = data.items.map((it: Record<string, unknown>) =>
-        Models.createItem((it.name as string) || '', (it.price as number) || 0, (it.color as string) || '#cccccc'),
+      replaceItems(
+        data.items.map((it: Record<string, unknown>) =>
+          Models.createItem((it.name as string) || '', (it.price as number) || 0, (it.color as string) || '#cccccc'),
+        ),
       );
-      editingItemId = null;
-      renderItems();
       if (errorEl) errorEl.textContent = '';
     } catch {
       if (errorEl) errorEl.textContent = 'Fehler beim Importieren: Ungültiges JSON-Format.';
     }
-  }
-
-  function on(id: string, event: string, handler: EventListener): void {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener(event, handler);
   }
 
   return { init };

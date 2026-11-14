@@ -169,6 +169,11 @@ function readItemEditRow(container: HTMLElement, id: string): ItemEditValues | n
   };
 }
 
+function on(id: string, event: string, handler: EventListener): void {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener(event, handler);
+}
+
 function setText(id: string, text: string): void {
   const el = document.getElementById(id);
   if (el) el.textContent = text;
@@ -315,6 +320,7 @@ export const UI = {
   renderTransactionBar,
   readItemEditRow,
   setText,
+  on,
   escapeHtml,
   escapeAttr,
 };

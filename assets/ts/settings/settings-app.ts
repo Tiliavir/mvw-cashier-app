@@ -102,12 +102,12 @@ const SettingsApp = (() => {
   }
 
   function bindEvents(): void {
-    on('btn-back-cashier', 'click', () => {
+    UI.on('btn-back-cashier', 'click', () => {
       sessionStorage.setItem('vt-direction', 'back');
       location.href = document.baseURI;
     });
 
-    on('btn-close-event', 'click', () => {
+    UI.on('btn-close-event', 'click', () => {
       const active = Storage.getActiveEvent(state);
       if (!active) return;
       if (!confirm(`Veranstaltung "${active.name}" wirklich beenden?`)) return;
@@ -115,11 +115,6 @@ const SettingsApp = (() => {
       renderActiveEvent();
       renderAllEvents();
     });
-  }
-
-  function on(id: string, event: string, handler: EventListener): void {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener(event, handler);
   }
 
   return { init };

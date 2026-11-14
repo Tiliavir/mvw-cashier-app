@@ -41,7 +41,7 @@ const App = (() => {
     const tileLastClick: Record<string, number> = {};
 
     // Item grid click: tile adds item, qty badge reduces
-    on('item-grid', 'click', (e: Event) => {
+    UI.on('item-grid', 'click', (e: Event) => {
       const event = e as MouseEvent;
       const tile = (event.target as HTMLElement).closest('.item-tile');
       if (!tile) return;
@@ -65,7 +65,7 @@ const App = (() => {
     });
 
     // Cancel transaction
-    on('btn-cancel-tx', 'click', () => {
+    UI.on('btn-cancel-tx', 'click', () => {
       cart = {};
       const receivedInput = document.getElementById('tx-received') as HTMLInputElement;
       if (receivedInput) receivedInput.value = '';
@@ -75,12 +75,12 @@ const App = (() => {
     });
 
     // Received input
-    on('tx-received', 'input', () => {
+    UI.on('tx-received', 'input', () => {
       updateTransactionBar();
     });
 
     // Next transaction
-    on('btn-next-tx', 'click', () => {
+    UI.on('btn-next-tx', 'click', () => {
       const active = Storage.getActiveEvent(state);
       if (!active) return;
 
@@ -116,18 +116,13 @@ const App = (() => {
     });
 
     // Settings navigation
-    on('btn-settings', 'click', () => {
+    UI.on('btn-settings', 'click', () => {
       const href = (document.getElementById('btn-settings') as HTMLElement).dataset.href;
       if (href) location.href = href;
     });
   }
 
   // ─── Utility: attach listener if element exists ───────────────────────────
-  function on(id: string, event: string, handler: EventListener): void {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener(event, handler);
-  }
-
   return { init };
 })();
 

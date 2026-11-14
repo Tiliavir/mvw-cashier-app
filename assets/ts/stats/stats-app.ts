@@ -24,7 +24,7 @@ const StatsApp = (() => {
     renderItemsTable(event);
     renderCharts(event);
 
-    on('btn-back-settings', 'click', () => {
+    UI.on('btn-back-settings', 'click', () => {
       sessionStorage.setItem('vt-direction', 'back');
       const href = (document.getElementById('btn-back-settings') as HTMLElement).dataset.href;
       if (href) location.href = href;
@@ -220,11 +220,6 @@ const StatsApp = (() => {
     svg.insertBefore(polyline, svg.childNodes[2] || null);
 
     container.appendChild(svg);
-  }
-
-  function on(id: string, event: string, handler: EventListener): void {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener(event, handler);
   }
 
   return { init };
