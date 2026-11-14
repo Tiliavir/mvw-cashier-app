@@ -10,7 +10,7 @@
   },
   "scripts": {
     "compile": "hugo --cleanDestinationDir --minify",
-    "lint": "stylelint assets/scss/style.scss && biome ci . && tsc --noEmit",
+    "lint": "stylelint assets/scss/style.scss && biome ci . && tsc --noEmit && tsc --noEmit -p assets/ts/sw",
     "validate": "npx vnu --skip-non-html --filterpattern '.*view-transition.*|.*CSS: Parse Error.*' public/**/*.html",
     "test": "npm run compile && node tests/scripts/run-playwright.js",
     "build": "npm run compile && npm run lint && npm run validate && npm run test",

@@ -7,7 +7,8 @@ A lightweight, browser-based cashier app for club events ("Vereinsfeste"). Built
 ## Features
 
 - 📦 **No frameworks** — Vanilla JS (ES6) + Hugo static site generator
-- 💾 **Offline-capable** — all data stored in `localStorage`
+- 💾 **Offline-capable** — all data stored in `localStorage`; pages cached by a service worker
+- 📲 **Installable** — add to the Android home screen, runs as standalone app
 - 📱 **Mobile-first** responsive layout
 - 🎟️ **Event management** — create and close events
 - 🛒 **Item tiles** — color-coded, tap to add to cart
