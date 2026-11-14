@@ -1,0 +1,18 @@
+{{- /* Service worker for offline use of the installed app. Production only: `hugo serve` must not serve cached pages. */ -}}
+{{- if hugo.IsProduction }}
+  {{- if .IsHome }}
+    {{- $urls := slice ("" | relURL) ("manifest.webmanifest" | relURL) ("favicon.svg" | relURL) -}}
+    {{- range site.Pages }}
+      {{- if in (slice "home" "section") .Kind }}{{ $urls = $urls | append .RelPermalink }}{{ end -}}
+    {{- end }}
+    {{- range slice "icon-192.png" "icon-512.png" "icon-maskable-192.png" "icon-maskable-512.png" "apple-touch-icon.png" }}
+      {{- $urls = $urls | append (printf "icons/%s" . | relURL) -}}
+    {{- end }}
+    {{- $defines := dict "SW_VERSION" (now.Unix | string | jsonify) "SW_URLS" ($urls | uniq | jsonify) -}}
+    {{- $sw := resources.Get "ts/sw/sw.ts" | js.Build (dict "targetPath" "sw.js" "defines" $defines "minify" true) -}}
+    {{- $sw.Publish -}}
+  {{- end }}
+  {{- with resources.Get "ts/register-sw.ts" | js.Build | minify }}
+  <script>{{ .Content | safeJS }}</script>
+  {{- end }}
+{{- end }}
