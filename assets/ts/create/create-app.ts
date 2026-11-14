@@ -93,73 +93,6 @@ const CreateApp = (() => {
       renderItems();
     });
 
-    function handleItemsClick(container: HTMLElement, target: HTMLElement): void {
-      const removeBtn = target.closest<HTMLElement>('.btn-remove-item');
-      if (removeBtn) {
-        pendingItems = pendingItems.filter((i: Item) => i.id !== removeBtn.dataset.id);
-        stopEditing();
-        return;
-      }
-      const saveBtn = target.closest<HTMLElement>('.btn-save-item');
-      if (saveBtn) {
-        saveItem(container, saveBtn.dataset.id ?? '');
-        return;
-      }
-      if (target.closest('.btn-cancel-edit')) {
-        stopEditing();
-        return;
-      }
-      const row = target.closest<HTMLElement>('.setup-item-row');
-      if (row && !row.classList.contains('setup-item-edit')) {
-        editingItemId = row.dataset.id ?? null;
-        renderItems();
-      }
-    }
-
-    function saveItem(container: HTMLElement, id: string): void {
-      const values = UI.readItemEditRow(container, id);
-      if (!values) return;
-      if (!values.name) {
-        alert('Bitte Artikelname eingeben.');
-        return;
-      }
-      const idx = pendingItems.findIndex((i: Item) => i.id === id);
-      if (idx >= 0) {
-        pendingItems[idx] = {
-          ...pendingItems[idx],
-          name: values.name,
-          price: Models.safeParseFloat(values.price),
-          color: values.color,
-        };
-      }
-      stopEditing();
-    }
-
-    function stopEditing(): void {
-      editingItemId = null;
-      renderItems();
-    }
-
-    async function importFile(file: File): Promise<void> {
-      const errorEl = document.getElementById('import-error');
-      try {
-        const data = JSON.parse(await file.text());
-        if (!data || typeof data.name !== 'string' || !Array.isArray(data.items)) {
-          throw new Error('Ungültiges Format');
-        }
-        const nameInput = document.getElementById('event-name') as HTMLInputElement;
-        if (nameInput) nameInput.value = data.name;
-        pendingItems = data.items.map((it: Record<string, unknown>) =>
-          Models.createItem((it.name as string) || '', (it.price as number) || 0, (it.color as string) || '#cccccc'),
-        );
-        editingItemId = null;
-        renderItems();
-        if (errorEl) errorEl.textContent = '';
-      } catch {
-        if (errorEl) errorEl.textContent = 'Fehler beim Importieren: Ungültiges JSON-Format.';
-      }
-    }
-
     on('btn-import', 'click', () => {
       const fileInput = document.getElementById('import-file') as HTMLInputElement;
       if (fileInput) fileInput.click();
@@ -198,6 +131,73 @@ const CreateApp = (() => {
       Storage.addEvent(currentState, event);
       location.href = document.baseURI;
     });
+  }
+
+  function handleItemsClick(container: HTMLElement, target: HTMLElement): void {
+    const removeBtn = target.closest<HTMLElement>('.btn-remove-item');
+    if (removeBtn) {
+      pendingItems = pendingItems.filter((i: Item) => i.id !== removeBtn.dataset.id);
+      stopEditing();
+      return;
+    }
+    const saveBtn = target.closest<HTMLElement>('.btn-save-item');
+    if (saveBtn) {
+      saveItem(container, saveBtn.dataset.id ?? '');
+      return;
+    }
+    if (target.closest('.btn-cancel-edit')) {
+      stopEditing();
+      return;
+    }
+    const row = target.closest<HTMLElement>('.setup-item-row');
+    if (row && !row.classList.contains('setup-item-edit')) {
+      editingItemId = row.dataset.id ?? null;
+      renderItems();
+    }
+  }
+
+  function saveItem(container: HTMLElement, id: string): void {
+    const values = UI.readItemEditRow(container, id);
+    if (!values) return;
+    if (!values.name) {
+      alert('Bitte Artikelname eingeben.');
+      return;
+    }
+    const idx = pendingItems.findIndex((i: Item) => i.id === id);
+    if (idx >= 0) {
+      pendingItems[idx] = {
+        ...pendingItems[idx],
+        name: values.name,
+        price: Models.safeParseFloat(values.price),
+        color: values.color,
+      };
+    }
+    stopEditing();
+  }
+
+  function stopEditing(): void {
+    editingItemId = null;
+    renderItems();
+  }
+
+  async function importFile(file: File): Promise<void> {
+    const errorEl = document.getElementById('import-error');
+    try {
+      const data = JSON.parse(await file.text());
+      if (!data || typeof data.name !== 'string' || !Array.isArray(data.items)) {
+        throw new Error('Ungültiges Format');
+      }
+      const nameInput = document.getElementById('event-name') as HTMLInputElement;
+      if (nameInput) nameInput.value = data.name;
+      pendingItems = data.items.map((it: Record<string, unknown>) =>
+        Models.createItem((it.name as string) || '', (it.price as number) || 0, (it.color as string) || '#cccccc'),
+      );
+      editingItemId = null;
+      renderItems();
+      if (errorEl) errorEl.textContent = '';
+    } catch {
+      if (errorEl) errorEl.textContent = 'Fehler beim Importieren: Ungültiges JSON-Format.';
+    }
   }
 
   function on(id: string, event: string, handler: EventListener): void {
